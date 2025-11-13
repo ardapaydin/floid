@@ -5,7 +5,7 @@ import { UserAvatar } from "../User/Avatar";
 export default function Navbar() {
     const user = useUser();
     return (
-        <div className="w-full py-4 px-4 border-b border-[#3b3b3b]">
+        <div className="w-full py-4 px-8 border-b border-[#3b3b3b]">
             <div className="w-full flex justify-between">
                 <h1 className="text-2xl font-bold">floid</h1>
 

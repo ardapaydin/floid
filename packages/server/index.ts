@@ -8,7 +8,7 @@ if (!process.env.PORT) throw new Error("PORT is not defined in .env");
 declare global {
   namespace Express {
     interface Request {
-      user?: { id?: string };
+      user?: { id: string };
     }
   }
 }

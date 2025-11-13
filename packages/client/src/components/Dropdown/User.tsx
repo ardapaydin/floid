@@ -15,7 +15,7 @@ export default function UserDropdownMenu({ children }: { children: React.ReactNo
                     <div className="flex items-center gap-2 text-sm" onClick={() => nav("/users/" + user.data.user?.username)}>
                         <UserAvatar user={user.data.user} />
                         <div className="flex flex-col">
-                            <p className="text-sm">View Profile</p>
+                            <p className="text-sm text-white">View Profile</p>
                             <p className="text-white/50 text-xs">u/{user.data.user.username}</p>
                         </div>
                     </div>

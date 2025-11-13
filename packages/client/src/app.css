@@ -4,8 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-html {
+body {
     font-family: "Montserrat", sans-serif;
+    color: white
 }
 
 @theme inline {
@@ -116,10 +117,11 @@ html {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+
+    body {
+        @apply bg-background text-foreground;
     }
 }

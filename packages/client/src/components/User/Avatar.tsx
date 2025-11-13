@@ -6,7 +6,7 @@ export function UserAvatar({ user, ...props }: {
 } & ComponentProps<'div'>) {
     const firstLetter = user.displayName.slice(0, 1).toUpperCase();
     return (
-        <div  {...props} className={cn("bg-orange-500/50 select-none rounded-full w-8 h-8 flex items-center justify-center", props.className)}>
+        <div  {...props} className={cn("bg-orange-500/50 select-none rounded-full w-8 h-8 text-white flex items-center justify-center", props.className)}>
             {firstLetter}
         </div>
     )

@@ -14,7 +14,7 @@ export const communitiesTable = mysqlTable("communities", {
     .$default(() => createId()),
   name: varchar("name", { length: 36 }).notNull(),
   description: varchar("description", { length: 2048 }),
-  creator: varchar("creator", { length: 36 }),
+  creator: varchar("creator", { length: 36 }).notNull(),
   visibility: varchar("visibility", {
     length: 36,
     enum: ["public", "private"],
