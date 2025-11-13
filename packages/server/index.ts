@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.disable("x-powered-by");
 
 import router from "./src/routes";
-app.use(router);
+app.use("/", router);
 app.use(
   (
     err: any,
