@@ -61,6 +61,7 @@ router.post(
       success: true,
       data: {
         userId: id,
+        token: signToken(id),
       },
     });
   }
@@ -70,7 +71,7 @@ router.post(
   "/login",
   requireNoAuth,
   (req, res, next) => BodyValidationMiddleware(req, res, next, loginSchema),
-  async (req, res, next) => {
+  async (req, res) => {
     const { email, password } = req.body;
     const [find] = await db
       .select()
