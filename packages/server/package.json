@@ -12,14 +12,18 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
     "drizzle-kit": "^0.31.6",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "zod": "^4.1.12"
   }
