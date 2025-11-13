@@ -1,4 +1,5 @@
 import { Home, Plus } from "lucide-react";
+import CreateCommunity from "../Dialogs/Community/Create";
 
 export function Sidebar() {
     return (
@@ -15,11 +16,13 @@ export function Sidebar() {
                     <h1 className="uppercase text-xs text-gray-300/50" style={{ letterSpacing: "0.03rem" }}>Communities</h1>
                 </div>
 
-                <div className="hover:bg-[#333]/20 mt-4 transition cursor-pointer flex py-2 px-4 rounded-lg gap-2 text-sm items-center">
-                    <Plus className="w-8" />
-                    Create Community
-                </div>
 
+                <CreateCommunity>
+                    <div className="hover:bg-[#333]/20 mt-4 transition cursor-pointer flex py-2 px-4 rounded-lg gap-2 text-sm items-center">
+                        <Plus className="w-8" />
+                        Create Community
+                    </div>
+                </CreateCommunity>
             </div>
         </div>
     )

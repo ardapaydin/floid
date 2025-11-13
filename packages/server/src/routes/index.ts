@@ -30,6 +30,6 @@ router.use(async (req, res, next) => {
 
 router.use("/auth", AuthRouter);
 router.use("/users", UsersRouter);
-router.use("/communities", CommunitiesRouter);
+router.use("/community", CommunitiesRouter);
 
 export default router;
