@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "dev": "nodemon --watch *.ts --ext ts --exec ts-node index.ts",
+    "drizzle:generate": "drizzle-kit generate ",
+    "drizzle:push": "drizzle-kit push",
+    "drizzle:migrate": "drizzle-kit migrate",
+    "drizzle:run": "drizzle-kit generate && drizzle-kit push"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "drizzle-kit": "^0.31.6",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.7",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3",
+    "zod": "^4.1.12"
+  }
+}
