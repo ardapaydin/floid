@@ -4,7 +4,7 @@ export default function Main() {
     return (
         <Layout>
             <div className="">
-                weqweeqw
+
             </div>
         </Layout>
     )

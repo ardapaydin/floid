@@ -3,6 +3,7 @@ export type User = {
   username: string;
   displayName: string;
   email: string;
+  profilePicture: string;
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;

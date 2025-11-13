@@ -11,3 +11,7 @@ export function useUser() {
     },
   });
 }
+
+export function getUsersDetails(userIds: string[]) {
+  return axios.post("/users/details", { userIds });
+}

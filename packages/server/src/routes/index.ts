@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import AuthRouter from "./auth";
 import UsersRouter from "./users";
+import CommunitiesRouter from "./communities";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
 import { count, eq } from "drizzle-orm";
@@ -29,5 +30,6 @@ router.use(async (req, res, next) => {
 
 router.use("/auth", AuthRouter);
 router.use("/users", UsersRouter);
+router.use("/communities", CommunitiesRouter);
 
 export default router;
