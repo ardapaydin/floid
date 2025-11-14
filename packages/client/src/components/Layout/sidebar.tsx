@@ -35,7 +35,7 @@ export function Sidebar() {
                         onClick={() => nav("/c/" + community.name)}
                         className="hover:bg-[#333]/20 transition cursor-pointer flex py-3 lg:px-4 rounded-lg gap-2 justify-between text-sm items-center">
                         <div className="flex items-center gap-2">
-                            <div className="bg-gray-500/50 rounded-full w-6 h-6" />
+                            <div className="rounded-full w-6 h-6" />
                             c/{community.name}
                         </div>
                         {community.visibility == "private" && <Lock className="text-muted-foreground/50" />}

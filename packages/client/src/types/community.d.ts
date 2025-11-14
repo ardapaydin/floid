@@ -5,6 +5,6 @@ export interface Community {
     creator: string;
     visibility: "public" | "private";
     disabled: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
