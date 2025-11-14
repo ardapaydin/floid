@@ -37,10 +37,10 @@ app.use(
   }
 );
 
-app.use((_req, res) => {
+app.use((req, res) => {
   return res.status(404).json({
     success: false,
-    message: "Resource not found",
+    message: `Cannot ${req.method} ${req.path}`,
   });
 });
 

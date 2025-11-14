@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../../../database/db";
 import { communitiesTable, communityMembersTable } from "../../../database";
 import { and, eq } from "drizzle-orm";
+import getPermissions from "../../../helpers/permissions/getPermissions";
 const router = express.Router();
 
 router.get("/:name", async (req, res) => {
@@ -35,7 +36,10 @@ router.get("/:name", async (req, res) => {
         .json({ success: false, message: "Community not found." });
   }
 
-  return res.status(200).json(find);
+  return res.status(200).json({
+    ...find,
+    ...{ permissions: await getPermissions(req.user?.id, find.id) },
+  });
 });
 
 export default router;

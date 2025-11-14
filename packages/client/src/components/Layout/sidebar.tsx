@@ -2,6 +2,7 @@ import { Home, Lock, Plus } from "lucide-react";
 import CreateCommunity from "../Dialogs/Community/Create";
 import { useCommunities } from "@/utils/api/community";
 import { useNavigate } from "react-router-dom";
+import { CommunityIcon } from "../Community/Icon";
 
 export function Sidebar() {
     const communities = useCommunities();
@@ -35,7 +36,7 @@ export function Sidebar() {
                         onClick={() => nav("/c/" + community.name)}
                         className="hover:bg-[#333]/20 transition cursor-pointer flex py-3 lg:px-4 rounded-lg gap-2 justify-between text-sm items-center">
                         <div className="flex items-center gap-2">
-                            <div className="rounded-full w-6 h-6" />
+                            <CommunityIcon community={community} className="w-6 h-6" style={{ fontSize: "9px" }} />
                             c/{community.name}
                         </div>
                         {community.visibility == "private" && <Lock className="text-muted-foreground/50" />}
