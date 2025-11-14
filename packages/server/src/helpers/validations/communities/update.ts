@@ -8,4 +8,5 @@ export const communityUpdateSchema = z.object({
     .min(3)
     .optional(),
   description: z.string().max(2048).trim().nullable().optional(),
+  visibility: z.enum(["public", "private"]).optional(),
 });

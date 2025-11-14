@@ -1,8 +1,10 @@
 import { CommunityIcon } from "@/components/Community/Icon";
-import { useCommunityByName, useDryrunName } from "@/utils/api/community";
+import type { Community } from "@/types/community";
+import { updateCommunity, useCommunityByName, useDryrunName } from "@/utils/api/community";
+import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function GeneralPage() {
     const { name } = useParams();
@@ -12,9 +14,25 @@ export default function GeneralPage() {
         name: name!,
         description: community.data?.description
     });
-
+    const qc = useQueryClient();
+    const nav = useNavigate();
     const findname = useDryrunName(form.name)
+    const update = async (field: string, value?: string) => {
+        if (!name) return;
+        const req = await updateCommunity(name, { [field]: value })
+        if (req.status == 200) {
+            if (field == "name") {
+                nav("/c/" + value);
+            }
 
+            qc.setQueryData(["communities", field == "name" ? value : name], (old: Community) => ({
+                ...old,
+                ...community,
+                [field]: value
+            }))
+            qc.invalidateQueries({ queryKey: ["communities"] })
+        }
+    }
     if (!community.data) return
     return (
         <div className="flex flex-col flex-1 min-h-full">
@@ -47,6 +65,7 @@ export default function GeneralPage() {
 
                             {form.name != name && (
                                 <button
+                                    onClick={() => update("name", form.name)}
                                     disabled={findname.data?.taken}
                                     className="px-4 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-0.5 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                                     Save
@@ -75,6 +94,7 @@ export default function GeneralPage() {
 
                 <div className="w-full flex justify-end mt-4 items-end">
                     <button
+                        onClick={() => update("description", form.description)}
                         disabled={community.data.description == form.description}
                         className="px-4 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-0.5 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                         Save

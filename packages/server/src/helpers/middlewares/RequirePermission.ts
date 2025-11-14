@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import permissions from "../permissions/permissions";
 import { db } from "../../database/db";
-import { communityMembersTable } from "../../database";
+import { communitiesTable, communityMembersTable } from "../../database";
 import { and, eq } from "drizzle-orm";
 import getPermissions from "../permissions/getPermissions";
 
@@ -11,7 +11,15 @@ export default async function RequirePermission(
   next: NextFunction,
   permission: string
 ) {
-  const { id } = req.params;
+  const { name } = req.params;
+  const [find] = await db
+    .select()
+    .from(communitiesTable)
+    .where(eq(communitiesTable.name, name));
+  if (!find)
+    return res
+      .status(404)
+      .json({ success: false, message: "Community not found." });
   const perm = permissions.get(permission);
   const [member] = await db
     .select()
@@ -19,7 +27,7 @@ export default async function RequirePermission(
     .where(
       and(
         eq(communityMembersTable.userId, req.user!.id),
-        eq(communityMembersTable.communityId, id)
+        eq(communityMembersTable.communityId, find.id)
       )
     );
 
@@ -28,7 +36,7 @@ export default async function RequirePermission(
       .status(403)
       .json({ success: false, message: "Not a member of community" });
 
-  const check = await getPermissions(req.user!.id, id);
+  const check = await getPermissions(req.user!.id, find.id);
   const has = Boolean(BigInt(check ?? "0") & BigInt(perm ?? 0));
 
   if (!has)

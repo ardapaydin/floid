@@ -6,6 +6,10 @@ export function createCommunity(name: string, description: string) {
   return axios.post("/community", { name, description });
 }
 
+export function updateCommunity(name: string, data: object) {
+  return axios.put("/community/" + name, data);
+}
+
 export function useDryrunName(name: string) {
   return useQuery({
     queryKey: ["dryrun", "name", name],

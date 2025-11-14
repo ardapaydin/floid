@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 import CommunitySettingsSidebar from "./Sidebar";
 import GeneralPage from "./Pages/General";
+import PrivacyPage from "./Pages/Privacy";
 export default function CommunitySettings({ children }: { children: React.ReactNode }) {
 
     const [page, setPage] = useState("general")
@@ -15,6 +16,7 @@ export default function CommunitySettings({ children }: { children: React.ReactN
                     <div className="flex flex-col flex-1 h-full relative overflow-auto">
                         <div className="p-4 py-12 mx-auto w-full max-w-7xl">
                             {page == "general" && <GeneralPage />}
+                            {page == "privacy" && <PrivacyPage />}
                         </div>
                     </div>
                 </div>

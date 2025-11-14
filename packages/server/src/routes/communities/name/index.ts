@@ -54,7 +54,7 @@ router.put(
     BodyValidationMiddleware(req, res, next, communityUpdateSchema),
   async (req, res) => {
     const { name: communityName } = req.params;
-    const { name, description } = req.body;
+    const { name, description, visibility } = req.body;
     if (name) {
       const [find] = await db
         .select()
@@ -75,6 +75,7 @@ router.put(
       .set({
         name,
         description,
+        visibility,
       })
       .where(eq(communitiesTable.name, communityName));
 
