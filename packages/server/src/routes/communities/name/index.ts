@@ -7,6 +7,7 @@ import { requireAuth } from "../../../helpers/middlewares/Auth";
 import RequirePermission from "../../../helpers/middlewares/RequirePermission";
 import BodyValidationMiddleware from "../../../helpers/middlewares/BodyValidation";
 import { communityUpdateSchema } from "../../../helpers/validations/communities/update";
+import CommentsRouter from "./comments";
 const router = express.Router();
 
 router.get("/:name", async (req, res) => {
@@ -82,5 +83,7 @@ router.put(
     return res.status(200).json({ success: true });
   }
 );
+
+router.use(CommentsRouter);
 
 export default router;

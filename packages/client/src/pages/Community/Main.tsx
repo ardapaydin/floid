@@ -2,13 +2,13 @@ import Header from "@/components/Community/Header";
 import Info from "@/components/Community/Info";
 import Layout from "@/components/Layout/layout";
 import { useCommunities, useCommunityByName } from "@/utils/api/community";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Community() {
     const { name } = useParams()
     const community = useCommunityByName(name!)
     const communities = useCommunities();
-
+    const nav = useNavigate()
     if (community.isLoading || communities.isLoading || !community.data) return <Layout><div></div></Layout>
     return (
         <Layout>
@@ -21,7 +21,9 @@ export default function Community() {
                         <div className="mt-32 flex flex-col justify-center items-center">
                             <h1 className="font-bold text-2xl">{name} community doesn't have any posts yet</h1>
 
-                            <button className="mt-4 w-32 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                            <button
+                                onClick={() => nav("submit")}
+                                className="mt-4 w-32 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                                 Create Post
                             </button>
 

@@ -3,22 +3,17 @@ import type { Community } from "@/types/community";
 import { updateCommunity, useCommunityByName } from "@/utils/api/community";
 import { useQueryClient } from "@tanstack/react-query";
 import { Earth, EyeClosed } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function PrivacyPage() {
     const { name } = useParams();
     const community = useCommunityByName(name!)
     const qc = useQueryClient();
-    const nav = useNavigate();
     const update = async (field: string, value?: string) => {
         if (!name) return;
         const req = await updateCommunity(name, { [field]: value })
         if (req.status == 200) {
-            if (field == "name") {
-                nav("/c/" + value);
-            }
-
-            qc.setQueryData(["communities", field == "name" ? value : name], (old: Community) => ({
+            qc.setQueryData(["communities", name], (old: Community) => ({
                 ...old,
                 ...community,
                 [field]: value
