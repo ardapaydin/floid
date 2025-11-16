@@ -2,7 +2,7 @@ import { Home, Lock, Plus } from "lucide-react";
 import CreateCommunity from "../Dialogs/Community/Create";
 import { useCommunities } from "@/utils/api/community";
 import { useNavigate } from "react-router-dom";
-import { CommunityIcon } from "../Community/Icon";
+import { CommunityIcon } from "../Community/Common/Icon";
 
 export function Sidebar() {
     const communities = useCommunities();

@@ -1,4 +1,4 @@
-import CommunityBox from "@/components/Community/Box";
+import CommunityBox from "@/components/Community/Common/Box";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { createCommunity, useDryrunName } from "@/utils/api/community";
 import { useState } from "react";

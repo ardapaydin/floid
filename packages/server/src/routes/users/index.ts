@@ -2,9 +2,6 @@ import express from "express";
 import { db } from "../../database/db";
 import { usersTable } from "../../database";
 import { eq, inArray } from "drizzle-orm";
-import BodyValidationMiddleware from "../../helpers/middlewares/BodyValidation";
-import z from "zod";
-import user from "../../helpers/db/selects/user";
 const router = express.Router();
 
 router.get("/me", async (req, res) => {

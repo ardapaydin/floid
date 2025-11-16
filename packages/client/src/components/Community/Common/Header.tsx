@@ -3,7 +3,7 @@ import { useCommunities } from "@/utils/api/community";
 import { CommunityIcon } from "./Icon";
 import hasPermission from "@/utils/permissions/check";
 import { Settings } from "lucide-react";
-import CommunitySettings from "./Dialogs/Settings/Settings";
+import CommunitySettings from "../Dialogs/Settings/Settings";
 import { useNavigate } from "react-router-dom";
 
 export default function Header({ community }: { community: Community }) {

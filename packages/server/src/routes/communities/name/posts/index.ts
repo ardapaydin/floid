@@ -39,7 +39,7 @@ router.get(
     if (sort == "best") {
       const d = new Date();
       d.setDate(d.getDate() - 30);
-      const posts = await db
+      let posts = await db
         .select({ ...post, comments: count(commentsTable.relatedTo) })
         .from(commentsTable)
         .where(
@@ -58,6 +58,25 @@ router.get(
         )
         .groupBy(commentsTable.id)
         .orderBy(desc(commentsTable.score));
+
+      for (const post of posts) {
+        (post as any).comments = (
+          await db
+            .select({ s: count() })
+            .from(commentsTable)
+            .where(eq(commentsTable.relatedTo, post.id))
+        )?.[0].s;
+
+        const allvotes = await db
+          .select()
+          .from(voteTable)
+          .where(eq(voteTable.commentId, post.id));
+        const total =
+          allvotes.filter((x) => x.type == "up").length -
+          allvotes.filter((x) => x.type == "down").length;
+        (post as any).votes = total;
+      }
+
       return res.status(200).json(posts);
     }
   }

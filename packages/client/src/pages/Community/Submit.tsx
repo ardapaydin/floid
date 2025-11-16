@@ -1,4 +1,4 @@
-import { CommunityIcon } from "@/components/Community/Icon";
+import { CommunityIcon } from "@/components/Community/Common/Icon";
 import Layout from "@/components/Layout/layout";
 import { useCommunityByName } from "@/utils/api/community";
 import { createCommunityPost } from "@/utils/api/post";

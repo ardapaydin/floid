@@ -2,7 +2,7 @@ import { userStore } from "@/store/userStore";
 import { usePosts } from "@/utils/api/post";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"
-
+import ObservedPost from "./Post";
 export default function Posts() {
     const { name } = useParams();
     const nav = useNavigate()
@@ -28,7 +28,7 @@ export default function Posts() {
     return (
         <div className="flex flex-col">
             {posts.data?.map((post => (
-                <div>{post.content}</div>
+                <ObservedPost post={post} />
             )))}
         </div>
     )

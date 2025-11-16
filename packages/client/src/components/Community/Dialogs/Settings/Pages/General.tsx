@@ -1,4 +1,4 @@
-import { CommunityIcon } from "@/components/Community/Icon";
+import { CommunityIcon } from "@/components/Community/Common/Icon";
 import type { Community } from "@/types/community";
 import { updateCommunity, useCommunityByName, useDryrunName } from "@/utils/api/community";
 import { useQueryClient } from "@tanstack/react-query";

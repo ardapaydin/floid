@@ -12,7 +12,8 @@ import z from "zod";
 import NameRouter from "./name";
 const router = express.Router();
 
-router.get("/", requireAuth, async (req, res) => {
+router.get("/", async (req, res) => {
+  if (!req.user?.id) return res.status(200).json([]);
   const memberships = await db
     .select()
     .from(communityMembersTable)

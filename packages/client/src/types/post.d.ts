@@ -10,6 +10,7 @@ export interface Post {
   relatedTo: string | null;
   deleted: boolean;
   vote: ("up" | "down") | null;
+  votes: number;
   comments: number;
   createdAt: string;
   updatedAt: string;

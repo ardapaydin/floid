@@ -1,6 +1,6 @@
-import Header from "@/components/Community/Header";
-import Info from "@/components/Community/Info";
-import Posts from "@/components/Community/Posts";
+import Header from "@/components/Community/Common/Header";
+import Info from "@/components/Community/Common/Info";
+import Posts from "@/components/Community/Post/Posts";
 import Layout from "@/components/Layout/layout";
 import { useCommunities, useCommunityByName } from "@/utils/api/community";
 import { useParams } from "react-router-dom";

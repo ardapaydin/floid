@@ -13,6 +13,10 @@ class UserStore {
     return this.communityUsers.get(communityName) || new Map();
   }
 
+  getUser(communityName: string, userId: string) {
+    return this.getUsersByCommunityName(communityName).get(userId);
+  }
+
   async getUsersBulk(communityName: string, userIds: string[]) {
     const users = this.getUsersByCommunityName(communityName);
     const filter = userIds.filter((id) => !users.has(id));
