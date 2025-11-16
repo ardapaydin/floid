@@ -8,6 +8,8 @@ import RequirePermission from "../../../helpers/middlewares/RequirePermission";
 import BodyValidationMiddleware from "../../../helpers/middlewares/BodyValidation";
 import { communityUpdateSchema } from "../../../helpers/validations/communities/update";
 import CommentsRouter from "./comments";
+import PostsRouter from "./posts";
+import MembersRouter from "./members";
 const router = express.Router();
 
 router.get("/:name", async (req, res) => {
@@ -85,5 +87,7 @@ router.put(
 );
 
 router.use(CommentsRouter);
+router.use(MembersRouter);
+router.use(PostsRouter);
 
 export default router;

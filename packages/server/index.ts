@@ -31,7 +31,7 @@ app.use(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    if (!res.headersSent) return next(err);
+    if (res.headersSent) return next(err);
     console.log(err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }

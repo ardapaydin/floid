@@ -26,25 +26,4 @@ router.get("/me", async (req, res) => {
   return res.status(200).json({ user });
 });
 
-router.post(
-  "/details",
-  (req, res, next) =>
-    BodyValidationMiddleware(
-      req,
-      res,
-      next,
-      z.object({ userIds: z.array(z.string()) })
-    ),
-  async (req, res) => {
-    const { userIds } = req.body;
-
-    const users = await db
-      .select(user)
-      .from(usersTable)
-      .where(inArray(usersTable.id, userIds));
-
-    return res.status(200).json({ users });
-  }
-);
-
 export default router;

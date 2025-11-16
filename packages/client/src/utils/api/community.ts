@@ -40,3 +40,9 @@ export function useCommunityByName(name: string) {
     },
   });
 }
+
+export function getMembersDetails(name: string, userIds: string[]) {
+  return axios.post("/community/" + name + "/members/details", {
+    userIds,
+  });
+}

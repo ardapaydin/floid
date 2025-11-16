@@ -7,9 +7,10 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import createId from "../../helpers/id/createId";
-import { sql } from "drizzle-orm";
 import { usersTable } from "./users";
 import { communitiesTable } from "./communities";
+import { customJson } from "../custom/json";
+import { sql } from "drizzle-orm";
 
 export const commentsTable = mysqlTable("comments", {
   id: varchar("id", { length: 36 })
@@ -18,10 +19,10 @@ export const commentsTable = mysqlTable("comments", {
     .primaryKey(),
   title: varchar("title", { length: 300 }),
   content: varchar("content", { length: 10240 }),
-  tags: json("tags")
+  tags: customJson("tags")
     .default(sql`'[]'`)
     .notNull(),
-  attachments: json("attachments")
+  attachments: customJson("attachments")
     .default(sql`'[]'`)
     .notNull(),
   createdBy: varchar("created_by", { length: 36 })
@@ -51,7 +52,8 @@ export const commentsTable = mysqlTable("comments", {
 export const voteTable = mysqlTable("votes", {
   id: varchar("id", { length: 36 })
     .notNull()
-    .$default(() => createId()),
+    .$default(() => createId())
+    .primaryKey(),
   userId: varchar("user_id", { length: 36 })
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
