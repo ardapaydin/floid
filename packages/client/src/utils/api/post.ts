@@ -15,3 +15,13 @@ export function usePosts(name: string, sort: "best" | "new") {
     },
   });
 }
+
+export function usePost(name: string, postId: string) {
+  return useQuery({
+    queryKey: [name, "posts", postId],
+    queryFn: async () => {
+      const d = await axios.get("/community/" + name + "/posts/" + postId);
+      return d.data as { post: Post };
+    },
+  });
+}

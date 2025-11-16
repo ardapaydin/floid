@@ -8,12 +8,14 @@ import {
   communitiesTable,
   voteTable,
 } from "../../../../database";
-import { and, count, desc, eq, gte, not } from "drizzle-orm";
+import { and, count, desc, eq, gte } from "drizzle-orm";
 import post from "../../../../helpers/db/selects/post";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 import z from "zod";
+import idRouter from "./id";
 const router = express.Router();
+router.use(idRouter);
 
 router.get(
   "/:name/posts",
@@ -121,48 +123,5 @@ router.post(
       .json({ success: true, data: { id, title, content, attachments, tags } });
   }
 );
-
-router.get("/:name/posts/:postId", CanAccessCommunity, async (req, res) => {
-  const { name, postId } = req.params;
-  const [findCommunity] = await db
-    .select()
-    .from(communitiesTable)
-    .where(eq(communitiesTable.name, name));
-
-  const [findPost] = await db
-    .select(post)
-    .from(commentsTable)
-    .leftJoin(
-      voteTable,
-      and(
-        eq(voteTable.commentId, commentsTable.id),
-        eq(voteTable.userId, req.user?.id || "")
-      )
-    )
-    .where(
-      and(
-        eq(commentsTable.id, postId),
-        eq(commentsTable.post, true),
-        eq(commentsTable.communityId, findCommunity.id)
-      )
-    );
-  if (!findPost)
-    return res.status(404).json({ success: false, message: "Post not found" });
-  const replies = await db
-    .select(post)
-    .from(commentsTable)
-    .leftJoin(
-      voteTable,
-      and(
-        eq(voteTable.commentId, commentsTable.id),
-        eq(voteTable.userId, req.user?.id || "")
-      )
-    )
-    .where(
-      and(eq(commentsTable.relatedTo, postId), eq(commentsTable.post, false))
-    );
-
-  return res.status(200).json({ post: findPost, replies });
-});
 
 export default router;
