@@ -18,8 +18,6 @@ router.post(
     ),
   async (req, res) => {
     const { userIds } = req.body;
-    const { name } = req.params;
-
     const users = await db
       .select({ ...user, joinedAt: communityMembersTable.joinedAt })
       .from(usersTable)

@@ -19,20 +19,24 @@ class UserStore {
 
   async getUsersBulk(communityName: string, userIds: string[]) {
     const users = this.getUsersByCommunityName(communityName);
-    const filter = userIds.filter((id) => !users.has(id));
+    const unique = [...new Set(userIds)];
+    const filter = unique.filter((id) => !users.has(id));
     if (!filter.length) return;
     runInAction(() => {
       filter.forEach((userId) => {
         this.setUserLoading(communityName, userId, true);
       });
     });
+    const batches = chunkArray(filter, 50);
 
-    const bulk = await getMembersDetails(communityName, filter);
-    runInAction(() => {
-      bulk.data.users.forEach((user: User) => {
-        this.setUser(communityName, user);
+    for (const batch of batches) {
+      const bulk = await getMembersDetails(communityName, batch);
+      runInAction(() => {
+        bulk.data.users.forEach((user: User) => {
+          this.setUser(communityName, user);
+        });
       });
-    });
+    }
     return filter;
   }
 
@@ -61,3 +65,11 @@ class UserStore {
   }
 }
 export const userStore = new UserStore();
+
+function chunkArray<T>(array: T[], chunk: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < array.length; i += chunk)
+    result.push(array.slice(i, i + chunk));
+
+  return result;
+}
