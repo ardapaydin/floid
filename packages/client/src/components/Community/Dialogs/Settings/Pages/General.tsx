@@ -1,9 +1,9 @@
 import { CommunityIcon } from "@/components/Community/Common/Icon";
 import type { Community } from "@/types/community";
-import { updateCommunity, useCommunityByName, useDryrunName } from "@/utils/api/community";
+import { updateCommunity, uploadIcon, useCommunityByName, useDryrunName } from "@/utils/api/community";
 import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function GeneralPage() {
@@ -17,6 +17,7 @@ export default function GeneralPage() {
     const qc = useQueryClient();
     const nav = useNavigate();
     const findname = useDryrunName(form.name)
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const update = async (field: string, value?: string) => {
         if (!name) return;
         const req = await updateCommunity(name, { [field]: value })
@@ -33,6 +34,24 @@ export default function GeneralPage() {
             qc.invalidateQueries({ queryKey: ["communities"] })
         }
     }
+
+    const changeIcon = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const form = new FormData();
+        form.append("icon", file);
+
+        const r = await uploadIcon(name!, form);
+        if (r.status == 200) {
+            qc.setQueryData(["communities", name], (old: Community) => ({
+                ...old,
+                ...community,
+                icon: r.data.key
+            }))
+        }
+    }
+
     if (!community.data) return
     return (
         <div className="flex flex-col flex-1 min-h-full">
@@ -46,10 +65,17 @@ export default function GeneralPage() {
                     <div className="flex gap-2 items-end">
                         <div className="w-24 h-24 bg-[#1d1c1c] relative rounded-full group border-[#1d1c1c] border-5 flex items-center justify-center">
                             <CommunityIcon community={community.data} className="text-2xl" />
-                            <div className="w-24 h-24 bg-[#1d1c1c]/50 absolute hidden group-hover:flex rounded-full cursor-pointer" />
+                            <div onClick={() => fileInputRef.current?.click()} className="w-24 h-24 bg-[#1d1c1c]/50 absolute hidden group-hover:flex rounded-full cursor-pointer" />
                             <div className="hidden group-hover:flex absolute left-1/2 -translate-x-1/2 cursor-pointer">
                                 <Image />
                             </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={changeIcon}
+                            />
                         </div>
                         <div className="flex items-end gap-1">
                             <div className="flex flex-col">

@@ -113,7 +113,10 @@ router.put(
       .from(communitiesTable)
       .where(eq(lower(communitiesTable.name), name.toLowerCase()));
     const uuid = crypto.randomUUID();
-    const key = `/icons/${community.id}/${uuid}.${file.name.split(".").pop()}`;
+    const key = `icons/${community.id}/${uuid}.${file.mimetype.replace(
+      "image/",
+      ""
+    )}`;
     await S3.send(
       new PutObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME!,
@@ -127,7 +130,7 @@ router.put(
     await db
       .update(communitiesTable)
       .set({
-        icon: key.replace("/icons/", ""),
+        icon: key.replace("icons/", ""),
       })
       .where(eq(communitiesTable.id, community.id));
 
@@ -140,7 +143,7 @@ router.put(
 
     return res.status(200).json({
       success: true,
-      key,
+      key: key.replace("icons/", ""),
     });
   }
 );

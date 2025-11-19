@@ -15,8 +15,8 @@ export const communitiesTable = mysqlTable("communities", {
     .primaryKey()
     .$default(() => createId()),
   name: varchar("name", { length: 36 }).notNull(),
-  icon: varchar("icon", { length: 36 }),
-  banner: varchar("banner", { length: 36 }),
+  icon: varchar("icon", { length: 255 }),
+  banner: varchar("banner", { length: 255 }),
   description: varchar("description", { length: 2048 }),
   creator: varchar("creator", { length: 36 }).notNull(),
   visibility: varchar("visibility", {

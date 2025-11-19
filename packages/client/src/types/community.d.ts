@@ -2,6 +2,7 @@ export interface Community {
   id: string;
   name: string;
   description?: string;
+  icon: string;
   creator: string;
   visibility: "public" | "private";
   disabled: boolean;
