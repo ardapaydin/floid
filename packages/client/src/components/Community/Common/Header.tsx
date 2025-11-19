@@ -11,7 +11,9 @@ export default function Header({ community }: { community: Community }) {
     const nav = useNavigate();
     return (
         <div className="flex flex-col relative">
-            <div className="w-full bg-[#222] h-32 rounded-lg" />
+            <div className="w-full bg-[#222] h-32 rounded-lg" >
+                {community.banner && <img src={import.meta.env.VITE_CDN_URL + "/banners/" + community.banner} className="object-cover w-full h-full rounded-lg" draggable={false} />}
+            </div>
             <div className="absolute -bottom-12 left-7 right-12 flex items-end gap-2 justify-between">
                 <div className="flex gap-2 items-end">
                     <div className="w-24 h-24 bg-[#1d1c1c] rounded-full border-[#1d1c1c] border-5">

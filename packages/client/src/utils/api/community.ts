@@ -50,3 +50,7 @@ export function getMembersDetails(name: string, userIds: string[]) {
 export function uploadIcon(name: string, form: FormData) {
   return axios.put("/community/" + name + "/icon", form);
 }
+
+export function uploadBanner(name: string, form: FormData) {
+  return axios.put("/community/" + name + "/banner", form);
+}

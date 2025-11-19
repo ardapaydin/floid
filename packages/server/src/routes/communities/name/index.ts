@@ -148,6 +148,60 @@ router.put(
   }
 );
 
+router.put(
+  "/:name/banner",
+  requireAuth,
+  (req, res, next) => RequirePermission(req, res, next, "MANAGE_COMMUNITY"),
+  (req, res, next) =>
+    FileValidationMiddleware(req, res, next, "banner", {
+      maxSize: 20 * 1024 * 1024,
+      mimetype: "image/",
+    }),
+  async (req, res) => {
+    const file = req.files?.banner as UploadedFile;
+    const { name } = req.params;
+
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(lower(communitiesTable.name), name.toLowerCase()));
+
+    const uuid = crypto.randomUUID();
+    const key = `banners/${community.id}/${uuid}${file.mimetype.replace(
+      "image/",
+      ""
+    )}`;
+
+    await S3.send(
+      new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME!,
+        Key: key,
+        Body: file.data,
+        ContentType: file.mimetype,
+        ACL: "public-read",
+      })
+    );
+
+    await db
+      .update(communitiesTable)
+      .set({
+        banner: key.replace("banners/", ""),
+      })
+      .where(eq(communitiesTable.id, community.id));
+
+    await db.insert(attachmentsTable).values({
+      uploadedBy: req.user?.id!,
+      type: "banners",
+      uuid,
+      key,
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, key: key.replace("banners/", "") });
+  }
+);
+
 router.use(CommentsRouter);
 router.use(MembersRouter);
 router.use(PostsRouter);

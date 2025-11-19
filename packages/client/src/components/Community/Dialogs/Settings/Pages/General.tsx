@@ -1,6 +1,6 @@
 import { CommunityIcon } from "@/components/Community/Common/Icon";
 import type { Community } from "@/types/community";
-import { updateCommunity, uploadIcon, useCommunityByName, useDryrunName } from "@/utils/api/community";
+import { updateCommunity, uploadBanner, uploadIcon, useCommunityByName, useDryrunName } from "@/utils/api/community";
 import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
 import { useRef, useState } from "react";
@@ -18,6 +18,7 @@ export default function GeneralPage() {
     const nav = useNavigate();
     const findname = useDryrunName(form.name)
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const bannerFileInputRef = useRef<HTMLInputElement>(null);
     const update = async (field: string, value?: string) => {
         if (!name) return;
         const req = await updateCommunity(name, { [field]: value })
@@ -52,14 +53,40 @@ export default function GeneralPage() {
         }
     }
 
+    const changeBanner = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const form = new FormData();
+        form.append("banner", file);
+
+        const r = await uploadBanner(name!, form);
+        if (r.status == 200) {
+            qc.setQueryData(["communities", name], (old: Community) => ({
+                ...old,
+                ...community,
+                banner: r.data.key
+            }))
+        }
+    }
+
     if (!community.data) return
     return (
         <div className="flex flex-col flex-1 min-h-full">
             <div className="flex flex-col relative">
-                <div className="w-full bg-[#222] h-42 rounded-lg relative">
+                <div className="w-full bg-[#222] h-42 rounded-lg relative cursor-pointer" onClick={() => bannerFileInputRef.current?.click()}>
+                    {community.data.banner && <img src={import.meta.env.VITE_CDN_URL + "/banners/" + community.data.banner} className="object-cover w-full h-full rounded-lg" draggable={false} />}
                     <div className="absolute bottom-4 right-4">
                         <Pencil className="w-4 cursor-pointer" />
                     </div>
+                    <input
+                        ref={bannerFileInputRef}
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={changeBanner}
+                    />
+
                 </div>
                 <div className="absolute -bottom-12 left-7 right-12 flex items-end gap-2 justify-between">
                     <div className="flex gap-2 items-end">
