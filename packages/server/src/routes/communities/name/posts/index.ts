@@ -1,7 +1,7 @@
 import express from "express";
 import { requireAuth } from "../../../../helpers/middlewares/Auth";
 import BodyValidationMiddleware from "../../../../helpers/middlewares/BodyValidation";
-import { createPostSchema } from "../../../../helpers/validations/communities/comment/create";
+import { createPostSchema } from "../../../../helpers/validations/communities/post/create";
 import { db } from "../../../../database/db";
 import {
   commentsTable,

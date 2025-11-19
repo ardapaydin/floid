@@ -3,6 +3,7 @@ import { usePosts } from "@/utils/api/post";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import ObservedPost from "./Post";
+import { commentStore } from "@/store/commentStore";
 export default function Posts() {
     const { name } = useParams();
     const nav = useNavigate()
@@ -10,6 +11,7 @@ export default function Posts() {
     useEffect(() => {
         if (!Array.isArray(posts.data) || !name) return;
         userStore.getUsersBulk(name, posts.data?.map((x) => x.createdBy))
+        commentStore.setComments(posts.data)
     }, [posts.data, name])
 
 

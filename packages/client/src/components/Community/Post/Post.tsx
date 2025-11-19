@@ -8,13 +8,23 @@ import dateToStr from "@/utils/date/dateToStr";
 import { useCommunityByName } from "@/utils/api/community";
 import { cn } from "@/lib/utils";
 import { CommunityIcon } from "../Common/Icon";
+import { votePost } from "@/utils/api/post";
+import { commentStore } from "@/store/commentStore";
 
 function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" | "post") }) {
     const { name } = useParams<{ name: string }>();
     const community = useCommunityByName(name!);
     const user = userStore.getUser(name!, post.createdBy);
+    const comment = commentStore.getComment(post.id);
     const nav = useNavigate();
+    if (!comment) return
     if (!community.data) return
+
+    const votepost = async (vote: ("up" | "down" | null)) => {
+        const r = await votePost(name!, post.id, vote);
+        if (r.status === 200) commentStore.voteComment(post.id, vote)
+    }
+
     return (
         <div
             onClick={() => section == "posts" ? nav("/c/" + name + "/comments/" + post.id) : null}
@@ -41,7 +51,7 @@ function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" 
                             <CommunityIcon community={community.data} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
                             <div className="flex flex-col">
                                 <h1 className="text-white/90">c/{community.data.name}</h1>
-                                <span>{user.displayName}</span>
+                                <span>{user?.displayName}</span>
                             </div>
                         </div>
                     ))}
@@ -61,12 +71,12 @@ function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" 
 
             <div className="flex gap-2 items-center">
                 <div className="flex bg-[#333]/90 px-2 max-w-min py-1 items-center rounded-full">
-                    <div className="hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
-                        <ChevronUp className={post.vote == "up" ? "text-green-500" : ""} />
+                    <div onClick={(e) => { e.stopPropagation(); if (comment.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
+                        <ChevronUp className={comment.vote == "up" ? "text-green-500" : ""} />
                     </div>
-                    <p className="text-xs mr-1 ml-1 font-semibold">{post.votes}</p>
-                    <div className="hover:transition hover:bg-[#222] hover:text-red-400 rounded-full">
-                        <ChevronDown className={post.vote == "down" ? "text-red-500" : ""} />
+                    <p className="text-xs mr-1 ml-1 font-semibold">{comment.votes}</p>
+                    <div onClick={(e) => { e.stopPropagation(); if (comment.vote == "down") votepost(null); else votepost("down") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-red-400 rounded-full">
+                        <ChevronDown className={comment.vote == "down" ? "text-red-500" : ""} />
                     </div>
                 </div>
 

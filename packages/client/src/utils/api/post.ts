@@ -25,3 +25,13 @@ export function usePost(name: string, postId: string) {
     },
   });
 }
+
+export function votePost(
+  name: string,
+  postId: string,
+  vote: "up" | "down" | null
+) {
+  return axios.post("/community/" + name + "/comments/" + postId + "/vote", {
+    vote,
+  });
+}
