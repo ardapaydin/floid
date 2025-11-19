@@ -14,6 +14,7 @@ import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommuni
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 import z from "zod";
 import idRouter from "./id";
+import { setCommentDetails } from "../../../../helpers/details/comment";
 const router = express.Router();
 router.use(idRouter);
 
@@ -61,23 +62,7 @@ router.get(
         .groupBy(commentsTable.id)
         .orderBy(desc(commentsTable.score));
 
-      for (const post of posts) {
-        (post as any).comments = (
-          await db
-            .select({ s: count() })
-            .from(commentsTable)
-            .where(eq(commentsTable.relatedTo, post.id))
-        )?.[0].s;
-
-        const allvotes = await db
-          .select()
-          .from(voteTable)
-          .where(eq(voteTable.commentId, post.id));
-        const total =
-          allvotes.filter((x) => x.type == "up").length -
-          allvotes.filter((x) => x.type == "down").length;
-        (post as any).votes = total;
-      }
+      for (const post of posts) await setCommentDetails(post);
 
       return res.status(200).json(posts);
     }

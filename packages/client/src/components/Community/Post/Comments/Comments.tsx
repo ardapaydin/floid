@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { userStore } from "@/store/userStore";
 import type { Post } from "@/types/post";
 import dateToStr from "@/utils/date/dateToStr";
-import { ChevronDown, ChevronUp, EllipsisIcon, Forward } from "lucide-react";
+import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Plus } from "lucide-react";
 import UserPart from "../Parts/User";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
@@ -23,6 +23,7 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
     const commentdata = commentStore.getComment(comment.id)
     const replies = (comments).filter(x => x.replyTo == comment.id).sort((a, b) => b.votes - a.votes)
     const [isReplying, setIsReplying] = useState(false);
+    const [viewMore, setViewMore] = useState(false);
     const votepost = async (vote: ("up" | "down" | null)) => {
         const r = await votePost(name!, comment.id, vote);
         if (r.status === 200) commentStore.voteComment(comment.id, vote)
@@ -76,9 +77,19 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
 
                 </div>
 
-                {replies.length > 0 && depth <= 8 && (
+                {replies.length > 0 && (depth <= 8 || viewMore) && (
                     <Comments comments={comments} commentId={comment.id} depth={depth + 1} />
                 )}
+
+                {(!viewMore && depth >= 8 && replies.length > 0) && (
+                    <div className="px-2">
+                        <div className="w-full flex justify-center items-center gap-2 py-2 mt-2 rounded-lg border opacity-20 hover:opacity-50 cursor-pointer transition-all" onClick={() => setViewMore(true)}>
+                            <Plus className="w-4 h-4" />
+                            <span className="text-sm font-medium">View more replies</span>
+                        </div>
+                    </div>
+                )}
+
             </div>
         </div>
     )

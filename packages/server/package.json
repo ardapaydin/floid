@@ -12,17 +12,20 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "@types/express-fileupload": "^1.5.1",
     "@types/jsonwebtoken": "^9.0.10",
     "drizzle-kit": "^0.31.6",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.935.0",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "zod": "^4.1.12"

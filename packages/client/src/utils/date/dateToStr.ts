@@ -1,6 +1,6 @@
 export default function dateToStr(d: string) {
   const date = new Date(d);
-  const diff = Math.abs(new Date().getTime() - date.getTime());
+  const diff = Math.abs(Date.now() - date.getTime());
 
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -10,9 +10,9 @@ export default function dateToStr(d: string) {
   const years = Math.floor(days / 365);
 
   if (seconds < 60) return `${seconds}s ago`;
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}hr ago`;
+  if (minutes < 60) return `${minutes}min ago`;
+  if (hours < 24) return `${hours}h ago`;
   if (days < 30) return `${days}d ago`;
-  if (months < 12) return `${months}m ago`;
+  if (months < 12) return `${months}mo ago`;
   return `${years}y ago`;
 }
