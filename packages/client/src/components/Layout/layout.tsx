@@ -13,7 +13,7 @@ export default function Layout({ children, contents = ["navbar", "sidebar"] }: {
                 {contents.includes("sidebar") && <Sidebar />}
 
                 <div className="flex flex-col flex-1 overflow-auto">
-                    <div className="p-4 py-4 mx-auto w-full max-w-7xl">
+                    <div className="p-4 py-4 h-full mx-auto w-full max-w-7xl">
                         {children}
                     </div>
                 </div>

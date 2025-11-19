@@ -2,6 +2,7 @@ import Info from "@/components/Community/Common/Info";
 import Comments from "@/components/Community/Post/Comments/Comments";
 import ObserverPost from "@/components/Community/Post/Post";
 import Layout from "@/components/Layout/layout";
+import Loading from "@/components/Loading/Loading";
 import { commentStore } from "@/store/commentStore";
 import { userStore } from "@/store/userStore";
 import type { Post } from "@/types/post";
@@ -23,8 +24,7 @@ export default function Comment() {
         commentStore.setComment(post.data.post)
         if (post.data.replies) userStore.getUsersBulk(name!, post.data.replies?.map((x) => x.createdBy))
     }, [post.data, name])
-
-    if (!community.data || !post.data) return;
+    if (!community.data || !post.data) return <Layout><Loading /></Layout>
 
     return (
         <Layout>
