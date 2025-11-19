@@ -52,6 +52,8 @@ router.post(
         content,
         createdBy: req.user!.id,
         score: 0,
+        post: false,
+        replyTo: comment.id,
         relatedTo: comment.post ? comment.id : comment.relatedTo,
       })
       .$returningId();
@@ -68,7 +70,7 @@ router.post(
       .where(
         and(
           eq(commentsTable.id, create.id),
-          eq(commentsTable.post, true),
+          eq(commentsTable.post, false),
           eq(commentsTable.communityId, community.id)
         )
       );

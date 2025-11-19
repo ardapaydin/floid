@@ -1,5 +1,5 @@
 import z from "zod";
 
 export const createCommentSchema = z.object({
-  content: z.string().max(10240).trim(),
+  content: z.string().min(1).max(10240).trim(),
 });

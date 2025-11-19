@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { userStore } from "@/store/userStore";
 import type { Post as PostType } from "@/types/post";
 import { useNavigate, useParams } from "react-router-dom";
-import { UserAvatar } from "@/components/User/Avatar";
 import { ChevronDown, ChevronUp, EllipsisIcon, Forward, MessageCircle } from "lucide-react";
 import dateToStr from "@/utils/date/dateToStr";
 import { useCommunityByName } from "@/utils/api/community";
@@ -10,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { CommunityIcon } from "../Common/Icon";
 import { votePost } from "@/utils/api/post";
 import { commentStore } from "@/store/commentStore";
+import UserPart from "./Parts/User";
 
 function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" | "post") }) {
     const { name } = useParams<{ name: string }>();
@@ -33,19 +33,7 @@ function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" 
             <div className="flex justify-between">
                 <div className="flex items-start gap-2 font-semibold text-muted-foreground text-sm">
                     {section == "posts" && (
-                        <>
-                            {(!user || user?.loading) && (
-                                <>
-                                    <div className="w-6 h-6 animate-pulse bg-[#333] rounded-full" />
-                                    <div className="w-20 h-2 animate-pulse bg-[#333] rounded" />
-                                </>
-                            ) || (
-                                    <>
-                                        <UserAvatar className="w-6 h-6" user={user} />
-                                        <h1>u/{user.username}</h1>
-                                    </>
-                                )}
-                        </>
+                        <UserPart user={user} />
                     ) || (section == "post" && (
                         <div className="flex gap-2">
                             <CommunityIcon community={community.data} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />

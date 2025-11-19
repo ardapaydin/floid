@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { commentsTable, voteTable } from "../../database";
 import { db } from "../../database/db";
 

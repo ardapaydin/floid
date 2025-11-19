@@ -21,7 +21,7 @@ export function usePost(name: string, postId: string) {
     queryKey: [name, "posts", postId],
     queryFn: async () => {
       const d = await axios.get("/community/" + name + "/posts/" + postId);
-      return d.data as { post: Post };
+      return d.data as { post: Post; replies: Post[] };
     },
   });
 }

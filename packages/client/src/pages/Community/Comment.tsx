@@ -1,9 +1,14 @@
 import Info from "@/components/Community/Common/Info";
+import Comments from "@/components/Community/Post/Comments/Comments";
 import ObserverPost from "@/components/Community/Post/Post";
 import Layout from "@/components/Layout/layout";
 import { commentStore } from "@/store/commentStore";
+import { userStore } from "@/store/userStore";
+import type { Post } from "@/types/post";
+import { replyComment } from "@/utils/api/comment";
 import { useCommunityByName } from "@/utils/api/community";
 import { usePost } from "@/utils/api/post";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,8 +19,9 @@ export default function Comment() {
     const post = usePost(name!, commentId!)
     const nav = useNavigate();
     useEffect(() => {
-        if (!post.data) return;
+        if (!post.data?.post) return;
         commentStore.setComment(post.data.post)
+        if (post.data.replies) userStore.getUsersBulk(name!, post.data.replies?.map((x) => x.createdBy))
     }, [post.data, name])
 
     if (!community.data || !post.data) return;
@@ -37,6 +43,10 @@ export default function Comment() {
                             <CommentInput />
                         </div>
 
+                        <div className="flex flex-col mt-8 px-8">
+                            <Comments comments={post.data.replies} commentId={commentId} />
+                        </div>
+
                     </div>
                     <Info community={community.data} />
                 </div>
@@ -48,15 +58,41 @@ export default function Comment() {
 function CommentInput() {
     const [input, setInput] = useState("")
     const [isFocused, setIsFocused] = useState(false)
+    const { name, commentId } = useParams();
+    const [errors, setErrors] = useState<Record<string, string[]>>();
+    const qc = useQueryClient();
+    const submit = async () => {
+        if (!name || !commentId) return;
+        const r = await replyComment(name, commentId, input);
+        if (r.status == 200) {
+            setIsFocused(false);
+            setInput("");
+            commentStore.setComment(r.data.data)
+            qc.setQueryData([name, "posts", commentId], (old: { replies: Post[] }) => ({
+                ...old,
+                replies: [
+                    r.data.data,
+                    ...old.replies,
+                ]
+            }))
+        }
+        else setErrors(r.data?.errors)
+    }
+
     return (
         <div className={`flex flex-col border-2 rounded-${isFocused ? "lg" : "full"} ${isFocused ? 'border-orange-500' : 'border-[#313131]'} cursor-text w-full`} onClick={() => setIsFocused(!isFocused)}>
+            {errors?.content && <p className="text-red-400">{errors.content[0]}</p>}
             {isFocused && (
                 <>
-                    <input
+                    <textarea
                         placeholder="Make a comment"
                         onChange={(e) => setInput(e.target.value)}
                         value={input}
-                        className={`px-4 py-2 w-full text-white focus:outline-none transition`}
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                        rows={3}
+                        maxLength={10240}
+                        className={`px-4 py-2 max-h-96 w-full text-white focus:outline-none transition`}
                     />
 
                     <div className="flex gap-2 items-center justify-end px-4 py-2">
@@ -66,7 +102,9 @@ function CommentInput() {
                         >
                             Cancel
                         </button>
-                        <button className="mt-4 justify-center px-2 items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-0.5 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition" >
+                        <button
+                            onClick={(e) => { e.stopPropagation(); submit() }}
+                            className="mt-4 justify-center px-2 items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-0.5 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition" >
                             Comment
                         </button>
                     </div>
