@@ -23,6 +23,7 @@ export function useUserProfile(name: string) {
         rep: number;
         posts: (Post & { community: Community })[];
         followers: number;
+        following: boolean;
       };
     },
   });
@@ -34,4 +35,12 @@ export function updateUserProfilePicture(data: FormData) {
 
 export function updateUserBanner(data: FormData) {
   return axios.post("/users/me/banner", data);
+}
+
+export function followUser(name: string) {
+  return axios.post("/users/" + name + "/follow");
+}
+
+export function unfollowUser(name: string) {
+  return axios.delete("/users/" + name + "/follow");
 }

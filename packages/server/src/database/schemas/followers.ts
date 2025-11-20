@@ -7,12 +7,13 @@ export const followersTable = mysqlTable("followers", {
     .notNull()
     .primaryKey()
     .$default(() => createId()),
-  userId: varchar("user_id", { length: 36 }).references(() => usersTable.id, {
-    onDelete: "cascade",
-  }),
-  following: varchar("following", { length: 36 }).references(
-    () => usersTable.id,
-    { onDelete: "cascade" }
-  ),
+  userId: varchar("user_id", { length: 36 })
+    .references(() => usersTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  following: varchar("following", { length: 36 })
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });

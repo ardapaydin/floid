@@ -12,6 +12,7 @@ import {
 import { and, count, desc, eq } from "drizzle-orm";
 import { setCommentDetails } from "../../../helpers/details/comment";
 import post from "../../../helpers/db/selects/post";
+import { requireAuth } from "../../../helpers/middlewares/Auth";
 const router = express.Router();
 
 router.get("/:name/profile", async (req, res) => {
@@ -72,14 +73,93 @@ router.get("/:name/profile", async (req, res) => {
     .from(followersTable)
     .where(eq(followersTable.following, u.id));
 
-  return res
-    .status(200)
-    .json({
-      ...u,
-      rep,
-      posts: commentsList.filter((x) => !x.replyTo),
-      followers,
-    });
+  const [following] = await db
+    .select()
+    .from(followersTable)
+    .where(
+      and(
+        eq(followersTable.userId, req.user?.id || ""),
+        eq(followersTable.following, u.id)
+      )
+    );
+
+  return res.status(200).json({
+    ...u,
+    rep,
+    posts: commentsList.filter((x) => !x.replyTo),
+    followers,
+    following: !!following,
+  });
+});
+
+router.post("/:name/follow", requireAuth, async (req, res) => {
+  const { name } = req.params;
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.username, name));
+  if (!user)
+    return res.status(404).json({ success: false, message: " user not found" });
+  if (user.id == req.user?.id)
+    return res
+      .status(403)
+      .json({ success: false, message: "cannot follow yourself" });
+
+  const [following] = await db
+    .select()
+    .from(followersTable)
+    .where(
+      and(
+        eq(followersTable.userId, req.user?.id!),
+        eq(followersTable.following, user.id)
+      )
+    );
+
+  if (following)
+    return res
+      .status(409)
+      .json({ success: false, message: "already following this user" });
+
+  const [{ id }] = await db
+    .insert(followersTable)
+    .values({
+      userId: req.user?.id!,
+      following: user.id,
+    })
+    .$returningId();
+
+  return res.status(200).json({ success: true, data: { id, user: user.id } });
+});
+
+router.delete("/:name/follow", async (req, res) => {
+  const { name } = req.params;
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.username, name));
+
+  if (!user)
+    return res.status(404).json({ success: false, message: "user not found" });
+  if (user.id == req.user?.id)
+    return res
+      .status(403)
+      .json({ success: false, message: "cannot follow yourself" });
+  const [following] = await db
+    .select()
+    .from(followersTable)
+    .where(
+      and(
+        eq(followersTable.userId, req.user!.id),
+        eq(followersTable.following, user.id)
+      )
+    );
+
+  if (!following)
+    return res.status(400).json({ success: false, message: "not following" });
+
+  await db.delete(followersTable).where(eq(followersTable.id, following.id));
+
+  return res.status(200).json({ success: true });
 });
 
 export default router;

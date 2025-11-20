@@ -3,7 +3,7 @@ import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
 import { UserAvatar } from "@/components/User/Avatar";
 import type { User } from "@/types/user";
-import { updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
+import { followUser, unfollowUser, updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
 import dateToStr from "@/utils/date/dateToStr";
 import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
@@ -42,6 +42,26 @@ export default function User() {
             ...old,
             banner: r.data.key
         }))
+    }
+
+    const triggerFollow = async () => {
+        if (!name) return
+        if (profile.data?.following) {
+            const r = await unfollowUser(name)
+            if (r.status == 200) qc.setQueryData(["users", name, "profile"], (old: (User & { followers: number })) => ({
+                ...old,
+                following: false,
+                followers: old.followers - 1
+            }))
+        }
+        else {
+            const r = await followUser(name)
+            if (r.status == 200) qc.setQueryData(["users", name, "profile"], (old: (User & { followers: number })) => ({
+                ...old,
+                following: true,
+                followers: old.followers + 1
+            }))
+        }
     }
 
     return (
@@ -102,7 +122,16 @@ export default function User() {
                             </div>
                             <div className="p-4 flex flex-col gap-4">
                                 <h1 className="text-gray-200 font-bold">{profile.data?.displayName}</h1>
+                                {profile.data?.id != user.data?.user?.id && (
+                                    <div className="flex">
+                                        <button
+                                            onClick={() => triggerFollow()}
+                                            className="px-2 justify-center items-center text-xs flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-1 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                                            {profile.data?.following ? "Unfollow" : "Follow"}
+                                        </button>
 
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-2 text-xs space-y-4">
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold">{profile.data?.rep}</span>
