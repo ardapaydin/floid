@@ -1,8 +1,9 @@
 import express from "express";
 import { db } from "../../database/db";
 import { usersTable } from "../../database";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 const router = express.Router();
+import profileRouter from "./profile";
 
 router.get("/me", async (req, res) => {
   if (!req.user?.id) return res.status(200).json({});
@@ -22,5 +23,7 @@ router.get("/me", async (req, res) => {
 
   return res.status(200).json({ user });
 });
+
+router.use(profileRouter);
 
 export default router;

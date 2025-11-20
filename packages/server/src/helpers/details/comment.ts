@@ -3,7 +3,7 @@ import { commentsTable, voteTable } from "../../database";
 import { db } from "../../database/db";
 
 export async function setCommentDetails(comment: any) {
-  (comment as any).comments = (
+  comment.comments = (
     await db
       .select({ s: count() })
       .from(commentsTable)
@@ -17,6 +17,6 @@ export async function setCommentDetails(comment: any) {
   const total =
     allvotes.filter((x) => x.type == "up").length -
     allvotes.filter((x) => x.type == "down").length;
-  (comment as any).votes = total;
+  comment.votes = total;
   return comment;
 }

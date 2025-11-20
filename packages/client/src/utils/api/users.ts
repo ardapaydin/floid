@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { User } from "../../types/user";
+import type { Post } from "@/types/post";
+import type { Community } from "@/types/community";
 
 export function useUser() {
   return useQuery({
@@ -12,6 +14,15 @@ export function useUser() {
   });
 }
 
-export function getUsersDetails(userIds: string[]) {
-  return axios.post("/users/details", { userIds });
+export function useUserProfile(name: string) {
+  return useQuery({
+    queryKey: ["users", name, "profile"],
+    queryFn: async () => {
+      const r = await axios.get("/users/" + name + "/profile");
+      return r.data as User & {
+        rep: number;
+        posts: (Post & { community: Community })[];
+      };
+    },
+  });
 }
