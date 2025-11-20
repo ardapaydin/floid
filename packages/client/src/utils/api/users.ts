@@ -22,6 +22,7 @@ export function useUserProfile(name: string) {
       return r.data as User & {
         rep: number;
         posts: (Post & { community: Community })[];
+        comments: (Post & { community: Community; relatedTitle: string })[];
         followers: number;
         following: boolean;
       };

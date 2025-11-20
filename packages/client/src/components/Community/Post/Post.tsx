@@ -12,7 +12,7 @@ import { commentStore } from "@/store/commentStore";
 import UserPart from "./Parts/User";
 import type { Community } from "@/types/community";
 
-function Post({ post, section = "posts" }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user") }) {
+function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
     const community = useCommunityByName(name!, section != "user");
     const user = userStore.getUser(name!, post.createdBy);
@@ -38,7 +38,7 @@ function Post({ post, section = "posts" }: { post: (PostType | (PostType & { com
             className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", (section == "posts" || section == "user") ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
         >
             <div className="flex justify-between">
-                <div className="flex items-start gap-2 font-semibold text-muted-foreground text-sm">
+                <div className="flex items-center gap-2 font-semibold text-muted-foreground text-sm">
                     {section == "posts" && (
                         <UserPart user={user} />
                     ) || (section == "post" && (
@@ -64,6 +64,19 @@ function Post({ post, section = "posts" }: { post: (PostType | (PostType & { com
 
                     )}
                     <p className="text-xs">•</p>
+                    {(relatedTitle && "community" in post) && (
+                        <>
+                            <div
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    nav("/c/" + post.community.name + "/comments/" + post.relatedTo)
+                                }}
+                                className="text-xs hover:underline hover:text-blue-300 transition-all">
+                                {relatedTitle}
+                            </div>
+                            <p className="text-xs">•</p>
+                        </>
+                    )}
                     <span className="text-xs">
                         {dateToStr(post.createdAt)}
                     </span>

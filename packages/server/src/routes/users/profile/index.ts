@@ -65,6 +65,14 @@ router.get("/:name/profile", async (req, res) => {
     )
       continue;
 
+    if (comment.relatedTo)
+      (comment as any).relatedTitle = (
+        await db
+          .select()
+          .from(commentsTable)
+          .where(eq(commentsTable.id, comment.relatedTo))
+      )?.[0].title;
+
     commentsList.push(comment);
   }
 
@@ -87,6 +95,7 @@ router.get("/:name/profile", async (req, res) => {
     ...u,
     rep,
     posts: commentsList.filter((x) => !x.replyTo),
+    comments: commentsList.filter((x) => x.replyTo),
     followers,
     following: !!following,
   });

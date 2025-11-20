@@ -1,4 +1,3 @@
-import ObserverPost from "@/components/Community/Post/Post";
 import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
 import { UserAvatar } from "@/components/User/Avatar";
@@ -9,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
+import MainSections from "./Sections/Main";
 
 export default function User() {
     const { name } = useParams();
@@ -95,18 +95,7 @@ export default function User() {
                         </div>
 
 
-                        <div className="flex mt-6 gap-2">
-                            <div className="hover:bg-[#444]/70 transition-all text-gray-200 font-semibold bg-[#444]/50 px-5 py-2 cursor-pointer rounded-full">
-                                Overview
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col mt-4">
-                            {profile.data?.posts?.map((post => (
-                                <ObserverPost post={post} section="user" />
-                            )))}
-
-                        </div>
+                        <MainSections />
                     </div>
 
                     <div className="w-full col-span-1 overflow-auto px-8">
