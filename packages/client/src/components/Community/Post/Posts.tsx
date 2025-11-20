@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import ObservedPost from "./Post";
 import { commentStore } from "@/store/commentStore";
+import Loading from "@/components/Loading/Loading";
 export default function Posts() {
     const { name } = useParams();
     const nav = useNavigate()
@@ -15,7 +16,7 @@ export default function Posts() {
     }, [posts.data, name])
 
 
-    if (posts.isLoading || !name) return;
+    if (posts.isLoading || !name) return <div className="mt-32"><Loading /></div>
     if (Array.isArray(posts.data) && !posts.data.length) return <div className="mt-32 flex flex-col justify-center items-center">
         <h1 className="font-bold text-2xl">{name} community doesn't have any posts yet</h1>
 

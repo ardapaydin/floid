@@ -5,10 +5,11 @@ import {
   commentsTable,
   communitiesTable,
   communityMembersTable,
+  followersTable,
   usersTable,
   voteTable,
 } from "../../../database";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { setCommentDetails } from "../../../helpers/details/comment";
 import post from "../../../helpers/db/selects/post";
 const router = express.Router();
@@ -66,9 +67,19 @@ router.get("/:name/profile", async (req, res) => {
     commentsList.push(comment);
   }
 
+  const [{ count: followers }] = await db
+    .select({ count: count() })
+    .from(followersTable)
+    .where(eq(followersTable.following, u.id));
+
   return res
     .status(200)
-    .json({ ...u, rep, posts: commentsList.filter((x) => !x.replyTo) });
+    .json({
+      ...u,
+      rep,
+      posts: commentsList.filter((x) => !x.replyTo),
+      followers,
+    });
 });
 
 export default router;

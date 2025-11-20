@@ -2,17 +2,22 @@ import { useUser } from "@/utils/api/users";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { UserAvatar } from "../User/Avatar";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function UserDropdownMenu({ children }: { children: React.ReactNode }) {
     const user = useUser();
-    const nav = useNavigate()
+    const nav = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
     if (!user.data?.user) return;
     return (
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
             <DropdownMenuContent className="border-0 w-64 bg-[#222121] mr-2">
                 <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-sm cursor-pointer hover:bg-[#333]/50 transition-all px-4 py-4 rounded-lg" onClick={() => nav("/u/" + user.data.user?.username)}>
+                    <div className="flex items-center gap-2 text-sm cursor-pointer hover:bg-[#333]/50 transition-all px-4 py-4 rounded-lg" onClick={() => {
+                        nav("/u/" + user.data.user?.username)
+                        setIsOpen(false)
+                    }}>
                         <UserAvatar user={user.data.user} />
                         <div className="flex flex-col">
                             <p className="text-sm text-white">View Profile</p>

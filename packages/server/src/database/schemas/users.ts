@@ -13,6 +13,7 @@ export const usersTable = mysqlTable("users", {
     .$default(() => createId()),
   username: varchar("username", { length: 128 }).notNull().unique(),
   profilePicture: varchar("profile_picture", { length: 255 }),
+  banner: varchar("banner", { length: 255 }),
   displayName: varchar("display_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
   password: varchar("password", { length: 255 }).notNull(),

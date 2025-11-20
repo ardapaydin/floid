@@ -22,6 +22,7 @@ export function useUserProfile(name: string) {
       return r.data as User & {
         rep: number;
         posts: (Post & { community: Community })[];
+        followers: number;
       };
     },
   });
@@ -29,4 +30,8 @@ export function useUserProfile(name: string) {
 
 export function updateUserProfilePicture(data: FormData) {
   return axios.post("/users/me/picture", data);
+}
+
+export function updateUserBanner(data: FormData) {
+  return axios.post("/users/me/banner", data);
 }

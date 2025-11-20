@@ -3,9 +3,10 @@ import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
 import { UserAvatar } from "@/components/User/Avatar";
 import type { User } from "@/types/user";
-import { updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
+import { updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
 import dateToStr from "@/utils/date/dateToStr";
-import { Image } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Image, Pencil } from "lucide-react";
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
 
@@ -13,15 +14,34 @@ export default function User() {
     const { name } = useParams();
     const profile = useUserProfile(name!);
     const user = useUser();
-    const fileInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const bannerRef = useRef<HTMLInputElement>(null);
+    const qc = useQueryClient();
     const changePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const form = new FormData();
         form.append("picture", file);
+        const r = await updateUserProfilePicture(form)
 
-        await updateUserProfilePicture(form)
+        if (r.status == 200) qc.setQueryData(["users", name, "profile"], (old: User) => ({
+            ...old,
+            profilePicture: r.data.key
+        }))
+    }
+    const changeBanner = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const form = new FormData();
+        form.append("banner", file);
+        const r = await updateUserBanner(form)
+
+        if (r.status == 200) qc.setQueryData(["users", name, "profile"], (old: User) => ({
+            ...old,
+            banner: r.data.key
+        }))
     }
 
     return (
@@ -71,11 +91,19 @@ export default function User() {
 
                     <div className="w-full col-span-1 overflow-auto px-8">
                         <div className="bg-[#04090a] flex w-full flex-col shadow rounded-lg">
-                            <div className="relative bg-linear-to-b from-orange-500/70 to-[#04090a] h-24 rounded-t-lg" />
+                            <div className="relative bg-linear-to-b from-orange-500/70 to-[#04090a] h-24 rounded-t-lg" >
+                                {profile.data?.banner && <img src={import.meta.env.VITE_CDN_URL + "/banner/" + profile.data.banner} className="w-full h-full object-cover rounded-t-lg" draggable={false} />}
+                                {profile.data?.id == user.data?.user?.id && (
+                                    <div className="bottom-0 absolute p-4 right-0 z-10">
+                                        <Pencil className="w-4 cursor-pointer" onClick={() => bannerRef.current?.click()} />
+                                        <input ref={bannerRef} type="file" className="hidden" accept="image/*" onChange={changeBanner} />
+                                    </div>
+                                )}
+                            </div>
                             <div className="p-4 flex flex-col gap-4">
                                 <h1 className="text-gray-200 font-bold">{profile.data?.displayName}</h1>
 
-                                <div className="grid grid-cols-2 text-xs">
+                                <div className="grid grid-cols-2 text-xs space-y-4">
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold">{profile.data?.rep}</span>
                                         <h1 className="text-white/50">Reputation</h1>
@@ -86,6 +114,11 @@ export default function User() {
                                             <h1 className="text-white/50">Account Age</h1>
                                         </div>
                                     }
+
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold">{profile.data?.followers}</span>
+                                        <h1 className="text-white/50">Followers</h1>
+                                    </div>
                                 </div>
                             </div>
                         </div>

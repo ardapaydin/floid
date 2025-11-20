@@ -25,8 +25,8 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
     const [isReplying, setIsReplying] = useState(false);
     const [viewMore, setViewMore] = useState(false);
     const votepost = async (vote: ("up" | "down" | null)) => {
-        const r = await votePost(name!, comment.id, vote);
-        if (r.status === 200) commentStore.voteComment(comment.id, vote)
+        commentStore.voteComment(comment.id, vote)
+        await votePost(name!, comment.id, vote);
     }
     if (!commentdata) {
         commentStore.setComment(comment);

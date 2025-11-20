@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { userStore } from "@/store/userStore";
 import type { Post as PostType } from "@/types/post";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, EllipsisIcon, Forward, MessageCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle } from "lucide-react";
 import dateToStr from "@/utils/date/dateToStr";
 import { useCommunityByName } from "@/utils/api/community";
 import { cn } from "@/lib/utils";
@@ -25,8 +25,8 @@ function Post({ post, section = "posts" }: { post: (PostType | (PostType & { com
     if (section !== "user" && !community.data) return
 
     const votepost = async (vote: ("up" | "down" | null)) => {
-        const r = await votePost(name!, post.id, vote);
-        if (r.status === 200) commentStore.voteComment(post.id, vote)
+        commentStore.voteComment(post.id, vote)
+        await votePost(name!, post.id, vote);
     }
 
     return (
@@ -46,7 +46,7 @@ function Post({ post, section = "posts" }: { post: (PostType | (PostType & { com
                             <CommunityIcon community={community.data!} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
                             <div className="flex flex-col">
                                 <h1 className="text-white/90">c/{community.data!.name}</h1>
-                                <span>{user?.displayName}</span>
+                                <span className="cursor-pointer hover:text-white transition-all" onClick={() => nav("/u/" + user?.username)}>{user?.displayName}</span>
                             </div>
                         </div>
                     ))}
@@ -54,9 +54,12 @@ function Post({ post, section = "posts" }: { post: (PostType | (PostType & { com
                         <div className="flex gap-2">
                             <CommunityIcon community={post.community} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
                             <div className="flex flex-col">
-                                <h1 className="text-white/90">c/{post.community!.name}</h1>
+                                <h1 className="text-white/90">c/{post.community.name}</h1>
                                 <span>{user?.displayName}</span>
                             </div>
+                            {post.community.visibility == "private" && (
+                                <Lock className="w-4 h-4" />
+                            )}
                         </div>
 
                     )}
