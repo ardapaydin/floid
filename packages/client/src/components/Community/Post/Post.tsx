@@ -10,15 +10,19 @@ import { CommunityIcon } from "../Common/Icon";
 import { votePost } from "@/utils/api/post";
 import { commentStore } from "@/store/commentStore";
 import UserPart from "./Parts/User";
+import type { Community } from "@/types/community";
 
-function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" | "post") }) {
+function Post({ post, section = "posts" }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user") }) {
     const { name } = useParams<{ name: string }>();
-    const community = useCommunityByName(name!);
+    const community = useCommunityByName(name!, section != "user");
     const user = userStore.getUser(name!, post.createdBy);
     const comment = commentStore.getComment(post.id);
     const nav = useNavigate();
-    if (!comment) return
-    if (!community.data) return
+    if (!comment) {
+        commentStore.setComment(post);
+        return;
+    }
+    if (section !== "user" && !community.data) return
 
     const votepost = async (vote: ("up" | "down" | null)) => {
         const r = await votePost(name!, post.id, vote);
@@ -27,8 +31,11 @@ function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" 
 
     return (
         <div
-            onClick={() => section == "posts" ? nav("/c/" + name + "/comments/" + post.id) : null}
-            className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", section == "posts" ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
+            onClick={() => {
+                if (section == "posts") nav("/c/" + name + "/comments/" + post.id)
+                if (section == "user" && "community" in post) nav("/c/" + post.community.name + "/comments/" + post.id)
+            }}
+            className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", (section == "posts" || section == "user") ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
         >
             <div className="flex justify-between">
                 <div className="flex items-start gap-2 font-semibold text-muted-foreground text-sm">
@@ -36,13 +43,23 @@ function Post({ post, section = "posts" }: { post: PostType, section?: ("posts" 
                         <UserPart user={user} />
                     ) || (section == "post" && (
                         <div className="flex gap-2">
-                            <CommunityIcon community={community.data} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
+                            <CommunityIcon community={community.data!} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
                             <div className="flex flex-col">
-                                <h1 className="text-white/90">c/{community.data.name}</h1>
+                                <h1 className="text-white/90">c/{community.data!.name}</h1>
                                 <span>{user?.displayName}</span>
                             </div>
                         </div>
                     ))}
+                    {"community" in post && (
+                        <div className="flex gap-2">
+                            <CommunityIcon community={post.community} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
+                            <div className="flex flex-col">
+                                <h1 className="text-white/90">c/{post.community!.name}</h1>
+                                <span>{user?.displayName}</span>
+                            </div>
+                        </div>
+
+                    )}
                     <p className="text-xs">•</p>
                     <span className="text-xs">
                         {dateToStr(post.createdAt)}

@@ -26,3 +26,7 @@ export function useUserProfile(name: string) {
     },
   });
 }
+
+export function updateUserProfilePicture(data: FormData) {
+  return axios.post("/users/me/picture", data);
+}

@@ -31,13 +31,14 @@ export function useCommunities() {
   });
 }
 
-export function useCommunityByName(name: string) {
+export function useCommunityByName(name: string, enabled: boolean = true) {
   return useQuery({
     queryKey: ["communities", name],
     queryFn: async () => {
       const d = await axios.get("/community/" + name);
       return d.data as Community;
     },
+    enabled,
   });
 }
 

@@ -19,7 +19,9 @@ export default function Navbar() {
                     ) || (user.data?.user) && (
                         <div className="flex gap-2 items-center">
                             <UserDropdownMenu>
-                                <UserAvatar user={user.data?.user} className="cursor-pointer" />
+                                <div>
+                                    <UserAvatar user={user.data?.user} className="cursor-pointer w-8 h-8" />
+                                </div>
                             </UserDropdownMenu>
                         </div>
                     )}
