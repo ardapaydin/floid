@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { userStore } from "@/store/userStore";
 import type { Post as PostType } from "@/types/post";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle, Trash } from "lucide-react";
 import dateToStr from "@/utils/date/dateToStr";
 import { useCommunityByName } from "@/utils/api/community";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { votePost } from "@/utils/api/post";
 import { commentStore } from "@/store/commentStore";
 import UserPart from "./Parts/User";
 import type { Community } from "@/types/community";
+import CommentDropdownMenu from "@/components/Dropdown/Comment";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -82,15 +83,24 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                     </span>
                 </div>
 
-                <div>
+                <CommentDropdownMenu comment={post}>
                     <EllipsisIcon className="text-muted-foreground hover:text-white cursor-pointer" />
-                </div>
+                </CommentDropdownMenu>
             </div>
 
             {post.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
             {post.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
 
-            <div className="flex gap-2 items-center">
+            {post.deleted && (
+                <div className="border p-4 border-[#444] rounded-lg gap-2 flex items-center px-6">
+                    <Trash className="text-red-400" />
+                    <div className="flex flex-col text-sm text-white/50">
+                        <p>This post deleted by the author or community moderator</p>
+                    </div>
+                </div>
+            )}
+
+            <div className={cn("flex gap-2 items-center", post.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
                 <div className="flex bg-[#333]/90 px-2 max-w-min py-1 items-center rounded-full">
                     <div onClick={(e) => { e.stopPropagation(); if (comment.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
                         <ChevronUp className={comment.vote == "up" ? "text-green-500" : ""} />

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { userStore } from "@/store/userStore";
 import type { Post } from "@/types/post";
 import dateToStr from "@/utils/date/dateToStr";
-import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Plus, Trash } from "lucide-react";
 import UserPart from "../Parts/User";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
@@ -11,6 +11,9 @@ import { commentStore } from "@/store/commentStore";
 import { useState } from "react";
 import { replyComment } from "@/utils/api/comment";
 import { useQueryClient } from "@tanstack/react-query";
+import CommentDropdownMenu from "@/components/Dropdown/Comment";
+import { UserAvatar } from "@/components/User/Avatar";
+import type { User } from "@/types/user";
 
 export default function Comments({ comments, commentId, depth = 0 }: { comments: Post[], commentId?: string, depth?: number }) {
     const filter = (comments).filter(x => x.replyTo == commentId).sort((a, b) => b.votes - a.votes);
@@ -38,21 +41,35 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
                 <div className={cn("flex flex-col gap-2 w-full px-3 py-2", depth === 0 && "border-b border-muted-foreground/10")}>
                     <div className="flex justify-between">
                         <div className="flex items-start gap-2 font-semibold text-muted-foreground text-sm">
-                            <UserPart user={user} />
+                            {comment.deleted && (
+                                <>
+                                    <UserAvatar className="w-6 h-6" user={{ displayName: "?" } as User} />
+                                    <h1>[comment deleted]</h1>
+                                </>
+                            ) ||
+                                <UserPart user={user} />}
                             <p className="text-xs">•</p>
                             <span className="text-xs">
                                 {dateToStr(comment.createdAt)}
                             </span>
                         </div>
 
-                        <div>
+                        <CommentDropdownMenu comment={comment}>
                             <EllipsisIcon className="text-muted-foreground hover:text-white cursor-pointer" />
-                        </div>
+                        </CommentDropdownMenu>
                     </div>
 
                     {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{comment.content}</p>}
+                    {comment.deleted && (
+                        <div className="border p-2 border-[#444] rounded-lg gap-2 flex items-center px-4">
+                            <Trash className="text-red-400 w-4" />
+                            <div className="flex flex-col text-sm text-white/50">
+                                <p>This comment deleted by the author or community moderator</p>
+                            </div>
+                        </div>
+                    )}
 
-                    <div className="flex gap-2 items-center">
+                    <div className={cn("flex gap-2 items-center", comment.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
                         <div className="flex bg-[#333]/90 px-2 max-w-min py-0.5 items-center rounded-full">
                             <div onClick={(e) => { e.stopPropagation(); if (commentdata.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
                                 <ChevronUp className={commentdata.vote == "up" ? "text-green-500" : ""} />

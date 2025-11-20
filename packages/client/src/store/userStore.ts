@@ -19,7 +19,7 @@ class UserStore {
 
   async getUsersBulk(communityName: string, userIds: string[]) {
     const users = this.getUsersByCommunityName(communityName);
-    const unique = [...new Set(userIds)];
+    const unique = [...new Set(userIds)].filter(Boolean);
     const filter = unique.filter((id) => !users.has(id));
     if (!filter.length) return;
     runInAction(() => {

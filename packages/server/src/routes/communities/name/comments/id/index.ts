@@ -45,6 +45,28 @@ router.post(
         .status(404)
         .json({ success: false, message: "comment not found" });
 
+    if (comment.relatedTo) {
+      const [related] = await db
+        .select()
+        .from(commentsTable)
+        .where(
+          and(
+            eq(commentsTable.id, comment.relatedTo),
+            eq(commentsTable.communityId, community.id)
+          )
+        );
+
+      if (related.deleted)
+        return res
+          .status(400)
+          .json({ success: false, message: "cannot reply to deleted posts" });
+    }
+
+    if (comment.deleted)
+      return res
+        .status(400)
+        .json({ success: false, message: "cannot reply to deleted comments" });
+
     const [create] = await db
       .insert(commentsTable)
       .values({
@@ -110,11 +132,15 @@ router.post(
           eq(commentsTable.communityId, community.id)
         )
       );
-
     if (!comment)
       return res
         .status(404)
         .json({ success: false, message: "comment not found" });
+    if (comment.deleted)
+      return res.status(400).json({
+        success: false,
+        message: "cannot upvote/downvote deleted comments",
+      });
     if (vote) {
       const [findvote] = await db
         .select()
@@ -167,5 +193,49 @@ router.post(
     return res.status(200).json({ success: true, data: { votes: total } });
   }
 );
+
+router.delete("/:name/comments/:commentId", requireAuth, async (req, res) => {
+  const { name, commentId } = req.params;
+
+  const [community] = await db
+    .select()
+    .from(communitiesTable)
+    .where(eq(communitiesTable.name, name));
+
+  const [comment] = await db
+    .select()
+    .from(commentsTable)
+    .where(
+      and(
+        eq(commentsTable.id, commentId),
+        eq(commentsTable.communityId, community.id),
+        eq(commentsTable.deleted, false)
+      )
+    );
+
+  if (!comment)
+    return res
+      .status(404)
+      .json({ success: false, message: "comment not found" });
+  if (comment.createdBy != req.user?.id)
+    return res.status(403).json({
+      success: false,
+      message: "you dont have permission to delete this comment",
+    });
+
+  await db
+    .update(commentsTable)
+    .set({
+      title: null,
+      content: null,
+      tags: [],
+      deleted: true,
+      score: -10000,
+      createdBy: null,
+    })
+    .where(eq(commentsTable.id, comment.id));
+
+  return res.status(200).json({ success: true });
+});
 
 export default router;

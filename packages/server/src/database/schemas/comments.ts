@@ -25,9 +25,10 @@ export const commentsTable = mysqlTable("comments", {
   attachments: customJson("attachments")
     .default(sql`'[]'`)
     .notNull(),
-  createdBy: varchar("created_by", { length: 36 })
-    .references(() => usersTable.id, { onDelete: "cascade" })
-    .notNull(),
+  createdBy: varchar("created_by", { length: 36 }).references(
+    () => usersTable.id,
+    { onDelete: "cascade" }
+  ),
   communityId: varchar("community_id", { length: 36 }).references(
     () => communitiesTable.id,
     { onDelete: "cascade" }

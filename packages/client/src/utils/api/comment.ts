@@ -6,3 +6,7 @@ export function replyComment(name: string, commentId: string, content: string) {
     { content }
   );
 }
+
+export function deleteComment(name: string, commentId: string) {
+  return axios.delete("/community/" + name + "/comments/" + commentId);
+}

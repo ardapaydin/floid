@@ -1,0 +1,32 @@
+import type { Post } from "@/types/post";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { useUser } from "@/utils/api/users";
+import { Trash } from "lucide-react";
+import { deleteComment } from "@/utils/api/comment";
+import { useParams } from "react-router-dom";
+import type { Community } from "@/types/community";
+
+export default function CommentDropdownMenu({ children, comment }: { children: React.ReactNode, comment: (Post | (Post & { community: Community })) }) {
+    const user = useUser();
+    const { name } = useParams();
+    const del = async () => {
+        await deleteComment("community" in comment ? comment.community.name : name!, comment.id);
+    }
+
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+            <DropdownMenuContent className="border-0 w-64 bg-[#222121] mr-2">
+                {comment.createdBy == user.data?.user?.id && (
+                    <DropdownMenuItem
+                        onClick={() => del()}
+                        className="text-red-500 focus:bg-[#333]/50 transition focus:text-red-400 cursor-pointer">
+                        <Trash />
+                        Delete
+                    </DropdownMenuItem>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
