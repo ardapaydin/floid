@@ -226,7 +226,6 @@ router.delete("/:name/comments/:commentId", requireAuth, async (req, res) => {
   await db
     .update(commentsTable)
     .set({
-      title: null,
       content: null,
       tags: [],
       deleted: true,

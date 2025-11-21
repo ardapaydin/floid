@@ -1,5 +1,5 @@
 import type { Post } from "@/types/post";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 export function createCommunityPost(name: string, body: object) {
@@ -7,12 +7,35 @@ export function createCommunityPost(name: string, body: object) {
 }
 
 export function usePosts(name: string, sort: "best" | "new") {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: [name, "posts", "sort", sort],
-    queryFn: async () => {
-      const d = await axios.get("/community/" + name + "/posts?sort=" + sort);
-      return d.data as Post[];
+    queryFn: async ({ pageParam }) => {
+      const d = await axios.get(
+        "/community/" +
+          name +
+          "/posts?sort=" +
+          sort +
+          "&offset=" +
+          pageParam +
+          "&limit=10"
+      );
+      return d.data as {
+        posts: Post[];
+        pagination: {
+          totalItems: number;
+          currentPage: number;
+          totalPages: number;
+          itemsPerPage: number;
+          hasNextPage: boolean;
+          hasPreviousPage: boolean;
+        };
+      };
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasNextPage
+        ? lastPage.pagination.currentPage * 10
+        : undefined,
   });
 }
 

@@ -34,7 +34,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
         <div
             onClick={() => {
                 if (section == "posts") nav("/c/" + name + "/comments/" + post.id)
-                if (section == "user" && "community" in post) nav("/c/" + post.community.name + "/comments/" + post.id)
+                if (section == "user" && "community" in post) nav("/c/" + post.community.name + "/comments/" + (post.relatedTo ? post.relatedTo : post.id))
             }}
             className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", (section == "posts" || section == "user") ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
         >

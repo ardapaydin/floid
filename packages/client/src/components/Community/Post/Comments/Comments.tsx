@@ -24,6 +24,7 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
     const { name } = useParams()
     const user = userStore.getUser(name!, comment.createdBy)
     const commentdata = commentStore.getComment(comment.id)
+    const related = commentStore.getComment(comment.relatedTo || "");
     const replies = (comments).filter(x => x.replyTo == comment.id).sort((a, b) => b.votes - a.votes)
     const [isReplying, setIsReplying] = useState(false);
     const [viewMore, setViewMore] = useState(false);
@@ -70,21 +71,23 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
                     )}
 
                     <div className={cn("flex gap-2 items-center", comment.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
-                        <div className="flex bg-[#333]/90 px-2 max-w-min py-0.5 items-center rounded-full">
+                        <div className="flex px-2 max-w-min py-0.5 items-center rounded-full">
                             <div onClick={(e) => { e.stopPropagation(); if (commentdata.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
                                 <ChevronUp className={commentdata.vote == "up" ? "text-green-500" : ""} />
                             </div>
-                            <p className="text-xs mr-1 ml-1 font-semibold">{commentdata.votes}</p>
+                            <p className="text-xs mr-1 ml-1 font-semibold">{commentdata.votes == 0 ? "Vote" : commentdata.votes}</p>
                             <div onClick={(e) => { e.stopPropagation(); if (commentdata.vote == "down") votepost(null); else votepost("down") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-red-400 rounded-full">
                                 <ChevronDown className={commentdata.vote == "down" ? "text-red-500" : ""} />
                             </div>
                         </div>
-                        <div className="flex bg-[#333]/90 hover:bg-[#444] transition px-3 gap-1 max-w-min py-0.5 items-center rounded-full cursor-pointer" onClick={() => setIsReplying(!isReplying)}>
-                            <div className="hover:transition rounded-full">
-                                <Forward className="w-4" />
+                        {!related?.deleted && (
+                            <div className="flex transition px-3 gap-1 max-w-min py-0.5 items-center rounded-full cursor-pointer" onClick={() => setIsReplying(!isReplying)}>
+                                <div className="hover:transition rounded-full">
+                                    <Forward className="w-4" />
+                                </div>
+                                <p className="text-xs font-semibold">Reply</p>
                             </div>
-                            <p className="text-xs font-semibold">Reply</p>
-                        </div>
+                        )}
                     </div>
 
                     {isReplying && (
