@@ -16,8 +16,6 @@ export default function Community() {
                 <Header community={community.data} />
                 <div className="mt-24 grid grid-cols-3 gap-4 min-h-screen">
                     <div className="w-full col-span-2 flex flex-col">
-                        <hr className="border-black" />
-
                         <Posts />
                     </div>
                     <Info community={community.data} />

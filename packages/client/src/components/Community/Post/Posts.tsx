@@ -1,14 +1,17 @@
 import { userStore } from "@/store/userStore";
 import { usePosts } from "@/utils/api/post";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import ObservedPost from "./Post";
 import { commentStore } from "@/store/commentStore";
 import Loading from "@/components/Loading/Loading";
+import { SortPosts } from "@/components/Dropdown/Sort";
+import { ChevronDown } from "lucide-react";
 export default function Posts() {
     const { name } = useParams();
     const nav = useNavigate()
-    const posts = usePosts(name!, "best");
+    const [sort, setSort] = useState<("best" | "new")>("best");
+    const posts = usePosts(name!, sort);
     useEffect(() => {
         if (!posts.data?.pages?.length || !name) return;
         const list = posts.data.pages.flatMap(page => page.posts);
@@ -16,7 +19,6 @@ export default function Posts() {
         commentStore.setComments(list)
     }, [posts.data, name])
 
-    if (posts.isLoading) return <Loading />
     if (posts.data?.pages?.length && posts.data.pages.every(page => !page.posts.length)) return <div className="mt-32 flex flex-col justify-center items-center">
         <h1 className="font-bold text-2xl">{name} community doesn't have any posts yet</h1>
 
@@ -28,11 +30,23 @@ export default function Posts() {
     </div>
 
     return (
-        <div className="flex flex-col mb-8">
+        <div className="flex flex-col">
+
+            <div className="flex">
+                <SortPosts sort={sort} setSort={setSort}>
+                    <div className="flex items-center gap-2 text-sm hover:bg-[#333] p-2 rounded-lg cursor-pointer">
+                        {sort == "best" ? "Best" : "New"}
+                        <ChevronDown className="w-4" />
+                    </div>
+                </SortPosts>
+
+            </div>
+            <hr className="border-black mb-4 mt-4" />
+            {posts.isLoading && <Loading />}
             {posts.data?.pages?.flatMap(page => page.posts).map((post => (
                 <ObservedPost key={post.id} post={post} />
             )))}
-            {posts.hasNextPage && (
+            {posts?.hasNextPage && (
                 <div
                     ref={(e) => {
                         if (e) {

@@ -27,7 +27,7 @@ router.get(
       res,
       next,
       z.object({
-        sort: z.enum(["best"]).optional().default("best"),
+        sort: z.enum(["best", "new"]).optional().default("best"),
         limit: z
           .string()
           .transform((val) => parseInt(val))
@@ -48,10 +48,12 @@ router.get(
     let { sort, limit, offset } = req.query;
     if (!limit) limit = "10";
     if (!offset) offset = "0";
+    let posts: any[] = [];
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+
     if (sort == "best") {
-      const d = new Date();
-      d.setDate(d.getDate() - 30);
-      let posts = await db
+      posts = await db
         .select({ ...post, comments: count(commentsTable.relatedTo) })
         .from(commentsTable)
         .where(
@@ -73,33 +75,57 @@ router.get(
         .orderBy(desc(commentsTable.score))
         .limit(Math.min(Number(limit), 30))
         .offset(Number(offset));
+    }
 
-      const [{ count: totalComments }] = await db
-        .select({ count: count() })
+    if (sort == "new") {
+      posts = await db
+        .select({ ...post, comments: count(commentsTable.relatedTo) })
         .from(commentsTable)
         .where(
           and(
             eq(commentsTable.communityId, findCommunity.id),
             eq(commentsTable.post, true),
-            eq(commentsTable.deleted, false),
-            gte(commentsTable.createdAt, d)
+            eq(commentsTable.deleted, false)
           )
-        );
-
-      for (const post of posts) await setCommentDetails(post);
-
-      return res.status(200).json({
-        posts,
-        pagination: {
-          totalItems: totalComments,
-          currentPage: Math.floor(Number(offset) / Number(limit)) + 1,
-          totalPages: Math.ceil(totalComments / Number(limit)),
-          itemsPerPage: Number(limit),
-          hasNextPage: Number(offset) + Number(limit) < totalComments,
-          hasPreviousPage: Number(offset) > 0,
-        },
-      });
+        )
+        .leftJoin(
+          voteTable,
+          and(
+            eq(voteTable.commentId, commentsTable.id),
+            eq(voteTable.userId, req.user?.id || "")
+          )
+        )
+        .groupBy(commentsTable.id)
+        .orderBy(desc(commentsTable.createdAt))
+        .limit(Math.min(Number(limit), 30))
+        .offset(Number(offset));
     }
+
+    const [{ count: totalComments }] = await db
+      .select({ count: count() })
+      .from(commentsTable)
+      .where(
+        and(
+          eq(commentsTable.communityId, findCommunity.id),
+          eq(commentsTable.post, true),
+          eq(commentsTable.deleted, false),
+          sort == "best" ? gte(commentsTable.createdAt, d) : undefined
+        )
+      );
+
+    for (const post of posts) await setCommentDetails(post);
+
+    return res.status(200).json({
+      posts,
+      pagination: {
+        totalItems: totalComments,
+        currentPage: Math.floor(Number(offset) / Number(limit)) + 1,
+        totalPages: Math.ceil(totalComments / Number(limit)),
+        itemsPerPage: Number(limit),
+        hasNextPage: Number(offset) + Number(limit) < totalComments,
+        hasPreviousPage: Number(offset) > 0,
+      },
+    });
   }
 );
 
