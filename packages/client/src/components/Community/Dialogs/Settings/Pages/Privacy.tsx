@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             <div className="flex flex-col relative gap-4">
                 <div
                     onClick={() => update("visibility", "public")}
-                    className="border-[#1d1d1d]/50 shadow-lg bg-[#242424]/60 hover:bg-[#242424] transition rounded-lg cursor-pointer items-center gap-2 border-2 p-4 flex">
+                    className="shadow-lg bg-[#242424]/60 hover:bg-[#242424] transition rounded-lg cursor-pointer items-center gap-2 p-4 flex">
                     <div
                         className={cn("border-2 border-muted-foreground/50 w-6 h-6 rounded-full", community.data.visibility === "public" ? "bg-green-500" : "")}
                     />
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                 </div>
                 <div
                     onClick={() => update("visibility", "private")}
-                    className="border-[#1d1d1d]/50 shadow-lg bg-[#242424]/60 hover:bg-[#242424] transition rounded-lg cursor-pointer items-center gap-2 border-2 p-4 flex">
+                    className="shadow-lg bg-[#242424]/60 hover:bg-[#242424] transition rounded-lg cursor-pointer items-center gap-2 p-4 flex">
                     <div
                         className={cn("border-2 border-muted-foreground/50 w-6 h-6 rounded-full", community.data.visibility === "private" ? "bg-green-500" : "")}
                     />

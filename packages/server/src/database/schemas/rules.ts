@@ -10,6 +10,7 @@ export const communityRulesTable = mysqlTable("community_rules", {
   communityId: varchar("communityId", { length: 36 })
     .references(() => communitiesTable.id, { onDelete: "cascade" })
     .notNull(),
+  title: varchar("title", { length: 64 }).notNull(),
   content: varchar("content", { length: 255 }),
   priority: int("priority").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow(),

@@ -27,7 +27,7 @@ export default function CreateCommunity({ children }: { children: React.ReactNod
                 <div className="flex w-full">
                     <div className="flex flex-col gap-4 w-3/5">
                         <div className="flex flex-col gap-1">
-                            <label className="text font-bold">Name</label>
+                            <label className="font-bold">Name</label>
                             {errors.name && <p className="text-red-400">{errors.name[0]}</p>}
                             {nameState.data?.taken && <p className="text-red-400">This community name is already in use.</p>}
                             <div className="flex focus-within:ring-2 rounded-lg focus-within:ring-orange-400/50 transition">
@@ -45,7 +45,7 @@ export default function CreateCommunity({ children }: { children: React.ReactNod
                             </div>
                         </div>
                         <div className="flex flex-col gap-1">
-                            <label className="text font-bold">Description</label>
+                            <label className="font-bold">Description</label>
                             {errors.description && <p className="text-red-400">{errors.description[0]}</p>}
                             <div className="flex focus-within:ring-2 rounded-lg focus-within:ring-orange-400/50 transition">
                                 <textarea

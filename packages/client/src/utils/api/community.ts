@@ -1,4 +1,5 @@
 import type { Community } from "@/types/community";
+import type { Rule } from "@/types/rule";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -39,6 +40,16 @@ export function useCommunityByName(name: string, enabled: boolean = true) {
       return d.data as Community;
     },
     enabled,
+  });
+}
+
+export function useCommunityRules(name: string) {
+  return useQuery({
+    queryKey: ["communities", name, "rules"],
+    queryFn: async () => {
+      const d = await axios.get("/community/" + name + "/rules");
+      return d.data as Rule[];
+    },
   });
 }
 
