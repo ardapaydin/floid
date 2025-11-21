@@ -1,5 +1,6 @@
 import type { Community } from "@/types/community";
 import { Cake, Earth } from "lucide-react";
+import RulesPart from "./Info/Rules";
 
 export default function Info({ community }: { community: Community }) {
     return (
@@ -16,6 +17,8 @@ export default function Info({ community }: { community: Community }) {
                     <Earth className="w-5" />
                     <p className="text-xs">{community.visibility == "private" ? "Private" : "Public"}</p>
                 </div>
+
+                <RulesPart community={community} />
             </div>
         </div>
     )

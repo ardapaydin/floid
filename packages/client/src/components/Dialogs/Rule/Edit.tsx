@@ -1,20 +1,21 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { createCommunityRule } from "@/utils/api/rules";
+import type { Rule } from "@/types/rule";
+import { updateCommunityRule } from "@/utils/api/rules";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-export default function CreateRule({ children }: { children: React.ReactNode }) {
+export default function EditRule({ children, rule }: { children: React.ReactNode, rule: Rule }) {
     const [form, setForm] = useState({
-        title: "",
-        content: ""
+        title: rule.title,
+        content: rule.content
     });
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [isOpen, setIsOpen] = useState(false);
     const { name } = useParams();
     const qc = useQueryClient();
     const post = async () => {
-        const r = await createCommunityRule(name!, form.title, form.content);
+        const r = await updateCommunityRule(name!, rule.id, form.title, form.content);
         if (r.status == 200) {
             setIsOpen(false);
             qc.invalidateQueries({ queryKey: ["communities", name!, "rules"] })
@@ -27,7 +28,7 @@ export default function CreateRule({ children }: { children: React.ReactNode }) 
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="bg-[#242424]">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl">Add Rule</DialogTitle>
+                    <DialogTitle className="text-2xl">Updating <b>{rule.title}</b> Rule</DialogTitle>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4">
@@ -70,7 +71,7 @@ export default function CreateRule({ children }: { children: React.ReactNode }) 
                         onClick={() => post()}
                         disabled={Object.keys(errors).length != 0 || !form.content.length || !form.title.length}
                         className="mt-4 px-4 justify-center items-center flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
-                        Create
+                        Update
                     </button>
 
                 </div>

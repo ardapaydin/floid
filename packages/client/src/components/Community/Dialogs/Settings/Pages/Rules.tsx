@@ -4,8 +4,10 @@ import { useCommunityRules } from "@/utils/api/community"
 import { Pencil, Trash } from "lucide-react";
 import { useParams } from "react-router-dom"
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
-import { updateCommunityRulePriorities } from "@/utils/api/rules";
+import { deleteCommunityRule, updateCommunityRulePriorities } from "@/utils/api/rules";
 import { useQueryClient } from "@tanstack/react-query";
+import EditRule from "@/components/Dialogs/Rule/Edit";
+import type { Rule } from "@/types/rule";
 export default function RulesPage() {
     const { name } = useParams();
     const rules = useCommunityRules(name!)
@@ -21,6 +23,11 @@ export default function RulesPage() {
         }))
         const r = await updateCommunityRulePriorities(name, update.map((r) => (r.id)).reverse())
         if (r.status == 200) qc.setQueryData(["communities", name, "rules"], () => update)
+    }
+
+    const del = async (ruleId: string) => {
+        const r = await deleteCommunityRule(name!, ruleId);
+        if (r.status == 200) qc.setQueryData(["communities", name, "rules"], (old: Rule[]) => ([...old.filter(x => x.id != ruleId)]))
     }
 
     return (
@@ -60,8 +67,10 @@ export default function RulesPage() {
                                                             </div>
 
                                                             <div className="flex gap-2">
-                                                                <Pencil className="w-4" />
-                                                                <Trash className="w-4 text-red-400" />
+                                                                <EditRule rule={rule}>
+                                                                    <Pencil className="w-4 cursor-pointer" />
+                                                                </EditRule>
+                                                                <Trash className="w-4 cursor-pointer text-red-400" onClick={() => del(rule.id)} />
                                                             </div>
                                                         </div>
                                                     )}

@@ -107,12 +107,87 @@ router.post(
         .set({
           priority: i,
         })
-        .where(eq(communityRulesTable.id, rule.id));
+        .where(
+          and(
+            eq(communityRulesTable.id, rule.id),
+            eq(communityRulesTable.communityId, community.id)
+          )
+        );
       newRules.push({ id: rule.id, priority: i });
       i++;
     }
 
     return res.status(200).json({ success: true, data: newRules });
+  }
+);
+
+router.put(
+  "/:name/rules/:ruleId",
+  requireAuth,
+  (req, res, next) => RequirePermission(req, res, next, "MANAGE_COMMUNITY"),
+  (req, res, next) =>
+    BodyValidationMiddleware(req, res, next, createRuleSchema),
+  async (req, res) => {
+    const { name, ruleId } = req.params;
+    const { title, content } = req.body;
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+
+    const [rule] = await db
+      .select()
+      .from(communityRulesTable)
+      .where(
+        and(
+          eq(communityRulesTable.id, ruleId),
+          eq(communityRulesTable.communityId, community.id)
+        )
+      );
+    if (!rule)
+      return res
+        .status(404)
+        .json({ success: false, message: "rule not found" });
+
+    await db
+      .update(communityRulesTable)
+      .set({ title, content })
+      .where(eq(communityRulesTable.id, ruleId));
+
+    return res.status(200).json({ success: true });
+  }
+);
+
+router.delete(
+  "/:name/rules/:ruleId",
+  requireAuth,
+  (req, res, next) => RequirePermission(req, res, next, "MANAGE_COMMUNITY"),
+  async (req, res) => {
+    const { name, ruleId } = req.params;
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+
+    const [rule] = await db
+      .select()
+      .from(communityRulesTable)
+      .where(
+        and(
+          eq(communityRulesTable.id, ruleId),
+          eq(communityRulesTable.communityId, community.id)
+        )
+      );
+
+    if (!rule)
+      return res
+        .status(404)
+        .json({ success: false, message: "Rule not found" });
+
+    await db
+      .delete(communityRulesTable)
+      .where(eq(communityRulesTable.id, ruleId));
+    return res.status(200).json({ success: true });
   }
 );
 
