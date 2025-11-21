@@ -4,3 +4,4 @@ export * from "./schemas/roles";
 export * from "./schemas/comments";
 export * from "./schemas/attachments";
 export * from "./schemas/followers";
+export * from "./schemas/rules";

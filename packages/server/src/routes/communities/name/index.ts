@@ -5,7 +5,7 @@ import {
   communitiesTable,
   communityMembersTable,
 } from "../../../database";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import getPermissions from "../../../helpers/permissions/getPermissions";
 import { requireAuth } from "../../../helpers/middlewares/Auth";
 import RequirePermission from "../../../helpers/middlewares/RequirePermission";
@@ -14,6 +14,7 @@ import { communityUpdateSchema } from "../../../helpers/validations/communities/
 import CommentsRouter from "./comments";
 import PostsRouter from "./posts";
 import MembersRouter from "./members";
+import RulesRouter from "./rules";
 import { lower } from "../../../database/custom/lower";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import FileValidationMiddleware from "../../../helpers/middlewares/FileValidation";
@@ -205,5 +206,6 @@ router.put(
 router.use(CommentsRouter);
 router.use(MembersRouter);
 router.use(PostsRouter);
+router.use(RulesRouter);
 
 export default router;
