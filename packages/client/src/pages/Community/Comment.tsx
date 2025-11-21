@@ -22,7 +22,10 @@ export default function Comment() {
     useEffect(() => {
         if (!post.data?.post) return;
         commentStore.setComment(post.data.post)
-        if (post.data.replies) userStore.getUsersBulk(name!, post.data.replies?.map((x) => x.createdBy))
+        if (post.data.replies) {
+            const userIds = [post.data.post.createdBy, ...post.data.replies.map((x) => x.createdBy)];
+            userStore.getUsersBulk(name!, [...new Set(userIds)]);
+        }
     }, [post.data, name])
     if (!community.data || !post.data) return <Layout><Loading /></Layout>
 
@@ -39,9 +42,11 @@ export default function Comment() {
                             </div>
                             <ObserverPost post={post.data.post} section="post" />
                         </div>
-                        <div className="w-full px-8">
-                            <CommentInput />
-                        </div>
+                        {!post.data.post.deleted &&
+                            <div className="w-full px-8">
+                                <CommentInput />
+                            </div>
+                        }
 
                         <div className="flex flex-col mt-8 px-8">
                             <Comments comments={post.data.replies} commentId={commentId} />

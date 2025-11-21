@@ -49,6 +49,7 @@ router.get(
           and(
             eq(commentsTable.communityId, findCommunity.id),
             eq(commentsTable.post, true),
+            eq(commentsTable.deleted, false),
             gte(commentsTable.createdAt, d)
           )
         )
