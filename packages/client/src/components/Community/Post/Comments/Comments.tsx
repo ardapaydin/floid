@@ -42,7 +42,7 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
                 <div className={cn("flex flex-col gap-2 w-full px-3 py-2", depth === 0 && "border-b border-muted-foreground/10")}>
                     <div className="flex justify-between">
                         <div className="flex items-start gap-2 font-semibold text-muted-foreground text-sm">
-                            {comment.deleted && (
+                            {commentdata.deleted && (
                                 <>
                                     <UserAvatar className="w-6 h-6" user={{ displayName: "?" } as User} />
                                     <h1>[comment deleted]</h1>
@@ -55,13 +55,13 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
                             </span>
                         </div>
 
-                        <CommentDropdownMenu comment={comment}>
+                        <CommentDropdownMenu comment={commentdata}>
                             <EllipsisIcon className="text-muted-foreground hover:text-white cursor-pointer" />
                         </CommentDropdownMenu>
                     </div>
 
-                    {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{comment.content}</p>}
-                    {comment.deleted && (
+                    {commentdata.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{commentdata.content}</p>}
+                    {commentdata.deleted && (
                         <div className="border p-2 border-[#444] rounded-lg gap-2 flex items-center px-4">
                             <Trash className="text-red-400 w-4" />
                             <div className="flex flex-col text-sm text-white/50">
@@ -70,7 +70,7 @@ function Comment({ comment, comments, depth = 0 }: { comment: Post, comments: Po
                         </div>
                     )}
 
-                    <div className={cn("flex gap-2 items-center", comment.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
+                    <div className={cn("flex gap-2 items-center", commentdata.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
                         <div className="flex px-2 max-w-min py-0.5 items-center rounded-full">
                             <div onClick={(e) => { e.stopPropagation(); if (commentdata.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
                                 <ChevronUp className={commentdata.vote == "up" ? "text-green-500" : ""} />

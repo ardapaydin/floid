@@ -16,13 +16,13 @@ import CommentDropdownMenu from "@/components/Dropdown/Comment";
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
     const community = useCommunityByName(name!, section != "user");
-    const user = userStore.getUser(name!, post.createdBy);
     const comment = commentStore.getComment(post.id);
     const nav = useNavigate();
     if (!comment) {
         commentStore.setComment(post);
         return;
     }
+    const user = userStore.getUser(name!, comment.createdBy);
     if (section !== "user" && !community.data) return
 
     const votepost = async (vote: ("up" | "down" | null)) => {
@@ -83,15 +83,15 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                     </span>
                 </div>
 
-                <CommentDropdownMenu comment={post}>
+                <CommentDropdownMenu comment={comment}>
                     <EllipsisIcon className="text-muted-foreground hover:text-white cursor-pointer" />
                 </CommentDropdownMenu>
             </div>
 
-            {post.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
-            {post.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
+            {comment.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
+            {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
 
-            {post.deleted && (
+            {comment.deleted && (
                 <div className="border p-4 border-[#444] rounded-lg gap-2 flex items-center px-6">
                     <Trash className="text-red-400" />
                     <div className="flex flex-col text-sm text-white/50">
@@ -100,7 +100,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                 </div>
             )}
 
-            <div className={cn("flex gap-2 items-center", post.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
+            <div className={cn("flex gap-2 items-center", comment.deleted ? "opacity-50 select-none cursor-not-allowed pointer-events-none" : "")}>
                 <div className="flex bg-[#333]/90 px-2 max-w-min py-1 items-center rounded-full">
                     <div onClick={(e) => { e.stopPropagation(); if (comment.vote == "up") votepost(null); else votepost("up") }} className="cursor-pointer hover:transition hover:bg-[#222] hover:text-orange-400 rounded-full">
                         <ChevronUp className={comment.vote == "up" ? "text-green-500" : ""} />

@@ -2,8 +2,8 @@ export interface Post {
   id: string;
   title: string;
   content: string;
-  tags: string;
-  attachments: string;
+  tags: string[];
+  attachments: string[];
   createdBy: string;
   communityId: string;
   replyTo: string | null;

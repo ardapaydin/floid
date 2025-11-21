@@ -5,12 +5,14 @@ import { Trash } from "lucide-react";
 import { deleteComment } from "@/utils/api/comment";
 import { useParams } from "react-router-dom";
 import type { Community } from "@/types/community";
+import { commentStore } from "@/store/commentStore";
 
 export default function CommentDropdownMenu({ children, comment }: { children: React.ReactNode, comment: (Post | (Post & { community: Community })) }) {
     const user = useUser();
     const { name } = useParams();
     const del = async () => {
         await deleteComment("community" in comment ? comment.community.name : name!, comment.id);
+        commentStore.setCommentData(comment.id, { deleted: true, title: "", content: "", attachments: [], tags: [], createdBy: "" })
     }
 
 
