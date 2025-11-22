@@ -8,31 +8,36 @@ import {
   voteTable,
 } from "../../database";
 import { and, eq, inArray, sql, count, desc, or, isNotNull } from "drizzle-orm";
-import { caseWhen } from "../../database/custom/dcase";
 import post from "../../helpers/db/selects/post";
-import ParamValidationMiddleware from "../../helpers/middlewares/ParamValidation";
 import { setCommentDetails } from "../../helpers/details/comment";
-import { mul } from "../../algorithm/database/mul";
 import { freshBoostByDate } from "../../algorithm/database/freshBoostByDate";
 import { memberBoost } from "../../algorithm/feed/memberBoost";
+import QueryValidationMiddleware from "../../helpers/middlewares/QueryValidation";
+import { selfPenalty } from "../../algorithm/feed/selfPenalty";
 const router = express.Router();
 
 router.get(
-  "/:page",
+  "/best",
   (req, res, next) =>
-    ParamValidationMiddleware(
+    QueryValidationMiddleware(
       req,
       res,
       next,
-      z.object({ page: z.enum(["best"]) })
+      z.object({
+        offset: z
+          .string()
+          .transform((val) => parseInt(val))
+          .optional(),
+      })
     ),
   async (req, res) => {
     const boost = memberBoost(req.user?.id || "");
-
+    let { offset } = req.query;
+    if (!offset) offset = "0";
     const fc = sql`(${commentsTable.score}) + ${boost} + (${freshBoostByDate(
       commentsTable.createdAt,
       24
-    )})`;
+    )}) + (${selfPenalty(req.user?.id || "")})`;
 
     const posts = await db
       .select({ ...post, comments: count(commentsTable.relatedTo), fc })
@@ -71,11 +76,56 @@ router.get(
       )
       .groupBy(commentsTable.id)
       .orderBy(desc(fc))
-      .limit(10);
-    for (const comment of posts) await setCommentDetails(comment);
-    return res
-      .status(200)
-      .json(posts.map((post) => ({ ...post, fc: undefined })));
+      .limit(10)
+      .offset(parseInt(offset as string));
+    for (const comment of posts) {
+      await setCommentDetails(comment);
+      const [community] = await db
+        .select()
+        .from(communitiesTable)
+        .where(eq(communitiesTable.id, comment.communityId!));
+      (comment as any).community = community;
+    }
+
+    const [{ count: totalComments }] = await db
+      .select({ count: count() })
+      .from(commentsTable)
+      .leftJoin(
+        communityMembersTable,
+        and(
+          eq(communityMembersTable.communityId, commentsTable.communityId),
+          eq(communityMembersTable.userId, req.user?.id || "")
+        )
+      )
+      .leftJoin(
+        communitiesTable,
+        eq(communitiesTable.id, commentsTable.communityId)
+      )
+      .where(
+        and(
+          eq(commentsTable.post, true),
+          eq(commentsTable.deleted, false),
+          or(
+            eq(communitiesTable.visibility, "public"),
+            and(
+              eq(communitiesTable.visibility, "private"),
+              isNotNull(communityMembersTable.userId)
+            )
+          )
+        )
+      );
+
+    return res.status(200).json({
+      posts: posts.map((post) => ({ ...post, fc: undefined })),
+      totalItems: {
+        totalComments,
+        currentPage: Math.floor(Number(offset) / 10) + 1,
+        totalPages: Math.ceil(totalComments / 10),
+        itemsPerPage: 10,
+        hasNextPage: Number(offset) + 10 < totalComments,
+        hasPreviousPage: Number(offset) > 0,
+      },
+    });
   }
 );
 
