@@ -16,6 +16,7 @@ import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryVali
 import z from "zod";
 import idRouter from "./id";
 import { setCommentDetails } from "../../../../helpers/details/comment";
+import { calculate } from "../../../../algorithm/calculate/calculate";
 const router = express.Router();
 router.use(idRouter);
 
@@ -172,7 +173,7 @@ router.post(
           url: attachment.key,
         })),
         communityId: findCommunity.id,
-        score: 0,
+        score: await calculate(req.user!.id),
         createdBy: req.user!.id,
         post: true,
       })

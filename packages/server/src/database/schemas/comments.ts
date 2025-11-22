@@ -1,5 +1,6 @@
 import {
   boolean,
+  float,
   int,
   json,
   mysqlTable,
@@ -45,7 +46,7 @@ export const commentsTable = mysqlTable("comments", {
   ),
   post: boolean("post").default(true),
   deleted: boolean("deleted").default(false),
-  score: int("score").notNull(),
+  score: float("score").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });

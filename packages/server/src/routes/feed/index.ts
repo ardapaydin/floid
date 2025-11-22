@@ -37,8 +37,7 @@ router.get(
     const fc = sql`(${commentsTable.score}) + ${boost} + (${freshBoostByDate(
       commentsTable.createdAt,
       24
-    )}) + (${selfPenalty(req.user?.id || "")})`;
-
+    )}) + (${selfPenalty(req.user?.id || "")})`.as("fc");
     const posts = await db
       .select({ ...post, comments: count(commentsTable.relatedTo), fc })
       .from(commentsTable)
@@ -116,8 +115,8 @@ router.get(
       );
 
     return res.status(200).json({
-      posts: posts.map((post) => ({ ...post, fc: undefined })),
-      totalItems: {
+      posts: posts.map((post) => ({ ...post })),
+      pagination: {
         totalComments,
         currentPage: Math.floor(Number(offset) / 10) + 1,
         totalPages: Math.ceil(totalComments / 10),
