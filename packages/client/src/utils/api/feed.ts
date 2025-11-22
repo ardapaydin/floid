@@ -2,7 +2,7 @@ import type { Post } from "@/types/post";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-export function useFeedPosts(feed: "best") {
+export function useFeedPosts(feed: "best" | "new") {
   return useInfiniteQuery({
     queryKey: ["feed", feed],
     queryFn: async ({ pageParam }) => {
