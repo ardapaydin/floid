@@ -6,7 +6,7 @@ import {
   communitiesTable,
   communityMembersTable,
 } from "../../database/schemas/communities";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { requireAuth } from "../../helpers/middlewares/Auth";
 import z from "zod";
 import NameRouter from "./name";
@@ -21,11 +21,23 @@ router.get("/", async (req, res) => {
 
   const communityIds = memberships.map((membership) => membership.communityId);
 
-  const communities = await db
+  let communities = await db
     .select()
     .from(communitiesTable)
     .where(inArray(communitiesTable.id, communityIds));
-
+  for (const community of communities) {
+    (community as any).role = (
+      await db
+        .select()
+        .from(communityMembersTable)
+        .where(
+          and(
+            eq(communityMembersTable.userId, req.user.id),
+            eq(communityMembersTable.communityId, community.id)
+          )
+        )
+    )?.[0]?.role;
+  }
   return res.status(200).json(communities);
 });
 router.post(

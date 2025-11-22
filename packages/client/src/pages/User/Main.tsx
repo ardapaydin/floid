@@ -67,7 +67,7 @@ export default function User() {
     return (
         <Layout>
             {profile.isLoading && <Loading /> ||
-                <div className="mt-8 grid grid-cols-3 gap-4 min-h-screen">
+                <div className="mt-8 md:grid grid-cols-3 gap-4 min-h-screen">
                     <div className="w-full col-span-2 flex flex-col">
                         <div className="flex items-center gap-4 px-4">
                             <div className="relative w-16 h-16">

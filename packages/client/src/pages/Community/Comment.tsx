@@ -32,7 +32,7 @@ export default function Comment() {
     return (
         <Layout>
             <div className="flex flex-col">
-                <div className="grid grid-cols-3 gap-4 min-h-screen">
+                <div className="md:grid md:grid-cols-3 gap-4 min-h-screen">
                     <div className="w-full col-span-2 flex flex-col">
                         <div className="flex w-full items-start">
                             <div className="my-4">

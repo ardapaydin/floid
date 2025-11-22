@@ -14,7 +14,7 @@ export default function Community() {
         <Layout>
             <div className="flex flex-col">
                 <Header community={community.data} />
-                <div className="mt-24 grid grid-cols-3 gap-4 min-h-screen">
+                <div className="mt-24 md:grid md:grid-cols-3 gap-4 min-h-screen">
                     <div className="w-full col-span-2 flex flex-col">
                         <Posts />
                     </div>

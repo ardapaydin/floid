@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import AuthRouter from "./auth";
 import UsersRouter from "./users";
+import FeedRouter from "./feed";
 import CommunitiesRouter from "./communities";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
@@ -31,5 +32,6 @@ router.use(async (req, res, next) => {
 router.use("/auth", AuthRouter);
 router.use("/users", UsersRouter);
 router.use("/community", CommunitiesRouter);
+router.use("/feed", FeedRouter);
 
 export default router;

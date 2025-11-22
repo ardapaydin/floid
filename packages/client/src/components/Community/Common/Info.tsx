@@ -4,7 +4,7 @@ import RulesPart from "./Info/Rules";
 
 export default function Info({ community }: { community: Community & { members: number } }) {
     return (
-        <div className="w-full px-8 col-span-1">
+        <div className="w-full md:px-8 col-span-1">
             <div className="bg-[#04090a] flex flex-col shadow p-4 rounded-lg gap-4">
                 <h1 className="font-bold text-gray-300">{community.name}</h1>
                 <p className="text-muted-foreground wrap-break-word whitespace-pre-wrap">{community.description}</p>
