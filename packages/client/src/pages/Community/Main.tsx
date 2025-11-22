@@ -2,13 +2,19 @@ import Header from "@/components/Community/Common/Header";
 import Info from "@/components/Community/Common/Info";
 import Posts from "@/components/Community/Post/Posts";
 import Layout from "@/components/Layout/layout";
+import { addRecentCommunity } from "@/store/recentCommunities";
 import { useCommunities, useCommunityByName } from "@/utils/api/community";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 export default function Community() {
     const { name } = useParams()
     const community = useCommunityByName(name!)
     const communities = useCommunities();
+    useEffect(() => {
+        if (!community?.data?.id) return;
+        addRecentCommunity(community.data)
+    }, [community.data])
     if (community.isLoading || communities.isLoading || !community.data) return <Layout><div></div></Layout>
     return (
         <Layout>
