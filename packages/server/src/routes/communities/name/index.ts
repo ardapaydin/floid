@@ -30,6 +30,12 @@ router.get("/:name", async (req, res) => {
     .select()
     .from(communitiesTable)
     .where(eq(communitiesTable.name, req.params.name));
+
+  if (!find)
+    return res
+      .status(404)
+      .json({ success: false, message: "Community not found." });
+
   const [member] = await db
     .select()
     .from(communityMembersTable)
@@ -39,11 +45,6 @@ router.get("/:name", async (req, res) => {
         eq(communityMembersTable.communityId, find.id)
       )
     );
-
-  if (!find)
-    return res
-      .status(404)
-      .json({ success: false, message: "Community not found." });
   if (find.visibility == "private" && (!req.user?.id || !member))
     return res
       .status(404)
