@@ -8,10 +8,13 @@ import {
   communityMembersTable,
   usersTable,
 } from "../../../../database";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, like, or } from "drizzle-orm";
 import { requireAuth } from "../../../../helpers/middlewares/Auth";
+import roleRouter from "./role";
+import RequirePermission from "../../../../helpers/middlewares/RequirePermission";
+import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 const router = express.Router();
-
+router.use(roleRouter);
 router.post(
   "/:name/members/details",
   (req, res, next) =>
@@ -42,6 +45,62 @@ router.post(
       .groupBy(usersTable.id);
 
     return res.status(200).json({ users });
+  }
+);
+
+router.get(
+  "/:name/members",
+  requireAuth,
+  (req, res, next) => RequirePermission(req, res, next, "MANAGE_MEMBERS"),
+  (req, res, next) =>
+    QueryValidationMiddleware(
+      req,
+      res,
+      next,
+      z.object({
+        query: z.string(),
+      })
+    ),
+  async (req, res) => {
+    const { name } = req.params;
+    const { query } = req.query;
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+
+    const members = await db
+      .select()
+      .from(communityMembersTable)
+      .where(eq(communityMembersTable.communityId, community.id));
+
+    const users = await db
+      .select({ ...user, joinedAt: communityMembersTable.joinedAt })
+      .from(usersTable)
+      .leftJoin(
+        communityMembersTable,
+        and(
+          eq(communityMembersTable.userId, usersTable.id),
+          eq(communityMembersTable.communityId, community.id)
+        )
+      )
+      .where(
+        and(
+          inArray(
+            usersTable.id,
+            members.map((member) => member.userId)
+          ),
+          or(
+            like(usersTable.username, query as string),
+            like(usersTable.displayName, query as string),
+            like(usersTable.id, query as string)
+          )
+        )
+      )
+      .groupBy(usersTable.id)
+      .limit(10);
+
+    return res.status(200).json(users);
   }
 );
 

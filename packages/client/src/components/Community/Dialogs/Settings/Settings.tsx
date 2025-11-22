@@ -4,6 +4,7 @@ import CommunitySettingsSidebar from "./Sidebar";
 import GeneralPage from "./Pages/General";
 import PrivacyPage from "./Pages/Privacy";
 import RulesPage from "./Pages/Rules";
+import { ModeratorsPage } from "./Pages/Moderators";
 export default function CommunitySettings({ children }: { children: React.ReactNode }) {
 
     const [page, setPage] = useState("general")
@@ -19,6 +20,7 @@ export default function CommunitySettings({ children }: { children: React.ReactN
                             {page == "general" && <GeneralPage />}
                             {page == "privacy" && <PrivacyPage />}
                             {page == "rules" && <RulesPage />}
+                            {page == "moderators" && <ModeratorsPage />}
                         </div>
                     </div>
                 </div>

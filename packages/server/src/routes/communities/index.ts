@@ -58,6 +58,7 @@ router.post(
     await db.insert(communityMembersTable).values({
       userId: req.user?.id as string,
       communityId: id,
+      role: "owner",
     });
 
     return res

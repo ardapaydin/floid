@@ -9,5 +9,6 @@ export interface Community {
   disabled: boolean;
   createdAt: string;
   updatedAt: string;
+  role: string;
   permissions: string;
 }

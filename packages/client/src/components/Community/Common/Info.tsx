@@ -1,8 +1,8 @@
 import type { Community } from "@/types/community";
-import { Cake, Earth } from "lucide-react";
+import { Cake, Earth, Users } from "lucide-react";
 import RulesPart from "./Info/Rules";
 
-export default function Info({ community }: { community: Community }) {
+export default function Info({ community }: { community: Community & { members: number } }) {
     return (
         <div className="w-full px-8 col-span-1">
             <div className="bg-[#04090a] flex flex-col shadow p-4 rounded-lg gap-4">
@@ -16,6 +16,10 @@ export default function Info({ community }: { community: Community }) {
                 <div className="flex items-center text-muted-foreground gap-3">
                     <Earth className="w-5" />
                     <p className="text-xs">{community.visibility == "private" ? "Private" : "Public"}</p>
+                </div>
+                <div className="flex items-center text-muted-foreground gap-3">
+                    <Users className="w-5" />
+                    <p className="text-xs">{community.members} Members</p>
                 </div>
 
                 <RulesPart community={community} />

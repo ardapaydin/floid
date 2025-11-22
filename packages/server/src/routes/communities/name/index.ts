@@ -5,7 +5,7 @@ import {
   communitiesTable,
   communityMembersTable,
 } from "../../../database";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import getPermissions from "../../../helpers/permissions/getPermissions";
 import { requireAuth } from "../../../helpers/middlewares/Auth";
 import RequirePermission from "../../../helpers/middlewares/RequirePermission";
@@ -16,6 +16,7 @@ import PostsRouter from "./posts";
 import MembersRouter from "./members";
 import RulesRouter from "./rules";
 import AttachmentsRouter from "./attachments";
+import RolesRouter from "./roles";
 import { lower } from "../../../database/custom/lower";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import FileValidationMiddleware from "../../../helpers/middlewares/FileValidation";
@@ -29,35 +30,37 @@ router.get("/:name", async (req, res) => {
     .select()
     .from(communitiesTable)
     .where(eq(communitiesTable.name, req.params.name));
+  const [member] = await db
+    .select()
+    .from(communityMembersTable)
+    .where(
+      and(
+        eq(communityMembersTable.userId, req.user?.id || ""),
+        eq(communityMembersTable.communityId, find.id)
+      )
+    );
 
   if (!find)
     return res
       .status(404)
       .json({ success: false, message: "Community not found." });
-  if (find.visibility == "private") {
-    if (!req.user?.id)
-      return res
-        .status(404)
-        .json({ success: false, message: "Community not found." });
-    const [member] = await db
-      .select()
-      .from(communityMembersTable)
-      .where(
-        and(
-          eq(communityMembersTable.userId, req.user.id),
-          eq(communityMembersTable.communityId, find.id)
-        )
-      );
+  if (find.visibility == "private" && (!req.user?.id || !member))
+    return res
+      .status(404)
+      .json({ success: false, message: "Community not found." });
 
-    if (!member)
-      return res
-        .status(404)
-        .json({ success: false, message: "Community not found." });
-  }
+  const [members] = await db
+    .select({ count: count() })
+    .from(communityMembersTable)
+    .where(eq(communityMembersTable.communityId, find.id));
 
   return res.status(200).json({
     ...find,
-    ...{ permissions: await getPermissions(req.user?.id, find.id) },
+    ...{
+      permissions: await getPermissions(req.user?.id, find.id),
+      role: member?.role,
+    },
+    ...{ members: members.count },
   });
 });
 
@@ -209,5 +212,6 @@ router.use(MembersRouter);
 router.use(PostsRouter);
 router.use(RulesRouter);
 router.use(AttachmentsRouter);
+router.use(RolesRouter);
 
 export default router;

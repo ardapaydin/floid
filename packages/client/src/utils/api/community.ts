@@ -37,7 +37,7 @@ export function useCommunityByName(name: string, enabled: boolean = true) {
     queryKey: ["communities", name],
     queryFn: async () => {
       const d = await axios.get("/community/" + name);
-      return d.data as Community;
+      return d.data as Community & { members: number };
     },
     enabled,
   });

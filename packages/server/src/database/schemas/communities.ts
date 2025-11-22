@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import createId from "../../helpers/id/createId";
 import { sql } from "drizzle-orm";
+import { usersTable } from "./users";
 
 export const communitiesTable = mysqlTable("communities", {
   id: varchar("id", { length: 36 })
@@ -37,10 +38,12 @@ export const communityMembersTable = mysqlTable("community_members", {
     .$default(() => createId()),
   communityId: varchar("community_id", { length: 36 })
     .notNull()
-    .references(() => communitiesTable.id),
-  roles: json("roles")
-    .$type<string[]>()
-    .default(sql`'[]'`),
-  userId: varchar("user_id", { length: 36 }).notNull(),
+    .references(() => communitiesTable.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 36 })
+    .default("member")
+    .$type<"member" | "mod" | "owner">(),
+  userId: varchar("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   joinedAt: timestamp("joined_at").defaultNow(),
 });

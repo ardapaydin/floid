@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { List, Settings, Shield } from "lucide-react";
+import { List, Settings, Shield, ShieldHalf } from "lucide-react";
 
 export default function CommunitySettingsSidebar({ page, setPage }: { page: string, setPage: React.Dispatch<React.SetStateAction<string>> }) {
     const isOpen = (name: string) => page == name ? "bg-[#333]" : ""
@@ -21,13 +21,20 @@ export default function CommunitySettingsSidebar({ page, setPage }: { page: stri
                     Privacy
                 </div>
 
-
                 <div
                     onClick={() => setPage("rules")}
                     className={cn("hover:bg-[#333]/20 transition cursor-pointer w-full flex py-3 xl:px-4 rounded-lg gap-2 text-sm items-center", isOpen("rules"))}>
                     <List className="w-8" />
                     Rules
                 </div>
+
+                <div
+                    onClick={() => setPage("moderators")}
+                    className={cn("hover:bg-[#333]/20 transition cursor-pointer w-full flex py-3 xl:px-4 rounded-lg gap-2 text-sm items-center", isOpen("moderators"))}>
+                    <ShieldHalf className="w-8" />
+                    Moderators
+                </div>
+
 
             </div>
         </div>
