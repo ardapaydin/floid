@@ -3,7 +3,7 @@ export interface Post {
   title: string;
   content: string;
   tags: string[];
-  attachments: string[];
+  attachments: { id: string; url: string }[];
   createdBy: string;
   communityId: string;
   replyTo: string | null;

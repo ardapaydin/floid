@@ -91,7 +91,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
 
             {comment.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
             {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
-            {comment.attachments && <Attachments post={comment} />}
+            {Boolean(comment.attachments.length) && <Attachments post={comment} />}
             {comment.deleted && (
                 <div className="border p-4 border-[#444] rounded-lg gap-2 flex items-center px-6">
                     <Trash className="text-red-400" />
