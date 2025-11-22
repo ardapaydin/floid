@@ -13,6 +13,8 @@ import { and, eq } from "drizzle-orm";
 import { createCommentSchema } from "../../../../../helpers/validations/communities/comment/create";
 import post from "../../../../../helpers/db/selects/post";
 import { setCommentDetails } from "../../../../../helpers/details/comment";
+import getPermissions from "../../../../../helpers/permissions/getPermissions";
+import hasPermission from "../../../../../helpers/permissions/hasPermission";
 const router = express.Router();
 
 router.post(
@@ -217,7 +219,13 @@ router.delete("/:name/comments/:commentId", requireAuth, async (req, res) => {
     return res
       .status(404)
       .json({ success: false, message: "comment not found" });
-  if (comment.createdBy != req.user?.id)
+
+  const permissions = await getPermissions(req.user?.id, community.id);
+
+  if (
+    comment.createdBy != req.user?.id &&
+    !hasPermission(permissions, "MANAGE_COMMUNITY")
+  )
     return res.status(403).json({
       success: false,
       message: "you dont have permission to delete this comment",
