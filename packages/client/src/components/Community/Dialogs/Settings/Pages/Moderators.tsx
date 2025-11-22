@@ -1,14 +1,24 @@
 import { AddModerator } from "@/components/Dialogs/Moderator/Add";
 import Loading from "@/components/Loading/Loading";
+import { UserAvatar } from "@/components/User/Avatar";
+import { cn } from "@/lib/utils";
+import type { User } from "@/types/user";
 import { useCommunityByName } from "@/utils/api/community";
-import { useRoleMembers } from "@/utils/api/roles";
-import { ShieldHalf } from "lucide-react";
+import { setMemberRole, useRoleMembers } from "@/utils/api/roles";
+import { useQueryClient } from "@tanstack/react-query";
+import { ShieldHalf, Trash } from "lucide-react";
 import { useParams } from "react-router-dom"
 
 export function ModeratorsPage() {
     const { name } = useParams();
     const community = useCommunityByName(name!);
     const moderators = useRoleMembers(name!, "mod")
+    const qc = useQueryClient();
+    const deleteMod = async (memberId: string) => {
+        const r = await setMemberRole(name!, memberId, "member");
+        if (r.status == 200) qc.setQueryData(["communities", name, "roles", "mod", "members"], (old: User[]) => (old.filter(x => x.id != memberId)))
+    }
+
     return (
         <div className="flex flex-col">
             {moderators.isLoading && <Loading /> || (
@@ -36,6 +46,21 @@ export function ModeratorsPage() {
                             </AddModerator>
                         </div>
                     )}
+
+                    {(Array.isArray(moderators.data) && moderators.data.length) && moderators.data.map((moderator) => (
+                        <div className="flex flex-col gap-2">
+                            <div className={cn("flex items-center justify-between p-2 px-4 rounded-lg bg-[#222]")}>
+                                <div className="flex items-center gap-2">
+                                    <UserAvatar user={moderator} />
+                                    <div className="flex flex-col">
+                                        <h1>{moderator.displayName}</h1>
+                                        <p className="text-muted-foreground text-xs">u/{moderator.username}</p>
+                                    </div>
+                                </div>
+                                <Trash onClick={() => deleteMod(moderator.id)} className="text-red-400 cursor-pointer w-5" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

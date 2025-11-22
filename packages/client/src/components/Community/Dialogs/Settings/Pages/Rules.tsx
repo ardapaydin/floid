@@ -1,7 +1,7 @@
 import CreateRule from "@/components/Dialogs/Rule/Create";
 import Loading from "@/components/Loading/Loading";
 import { useCommunityRules } from "@/utils/api/community"
-import { Pencil, Trash } from "lucide-react";
+import { List, Pencil, Trash } from "lucide-react";
 import { useParams } from "react-router-dom"
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { deleteCommunityRule, updateCommunityRulePriorities } from "@/utils/api/rules";
@@ -45,6 +45,21 @@ export default function RulesPage() {
                                 </div>
                             </CreateRule>
                         </div>
+
+                        {(Array.isArray(rules.data) && !rules.data.length) && (
+                            <div className="mt-32 flex flex-col gap-4 justify-center items-center">
+                                <List className="w-32 h-32 text-red-500" />
+                                <h1 className="font-bold text-2xl">{name} community doesn't have any rules yet</h1>
+                                <CreateRule>
+                                    <button
+                                        className="px-2 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                                        Add rule
+                                    </button>
+                                </CreateRule>
+                            </div>
+                        )}
+
+
                         <div className="flex flex-col gap-2">
                             <DragDropContext onDragEnd={handleDragEnd}>
                                 <Droppable droppableId="rules">

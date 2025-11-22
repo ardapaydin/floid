@@ -63,9 +63,10 @@ router.post(
       .where(
         and(
           eq(communityMembersTable.communityId, community.id),
-          eq(communityMembersTable.userId, req.user!.id)
+          eq(communityMembersTable.userId, memberId)
         )
       );
+    return res.status(200).json({ success: true });
   }
 );
 

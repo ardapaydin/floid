@@ -91,9 +91,9 @@ router.get(
             members.map((member) => member.userId)
           ),
           or(
-            like(usersTable.username, query as string),
-            like(usersTable.displayName, query as string),
-            like(usersTable.id, query as string)
+            like(usersTable.username, `%${query}%`),
+            like(usersTable.displayName, `%${query}%`),
+            like(usersTable.id, `%${query}%`)
           )
         )
       )
