@@ -19,3 +19,7 @@ export function useVerifyEmail(token: string | null) {
     enabled: Boolean(token),
   });
 }
+
+export function requestVerifyToken() {
+  return axios.post("/auth/request-token");
+}

@@ -1,3 +1,4 @@
+import Alerts from "./alerts"
 import Navbar from "./navbar"
 import { Sidebar } from "./sidebar"
 
@@ -7,6 +8,7 @@ export default function Layout({ children, contents = ["navbar", "sidebar"] }: {
 }) {
     return (
         <div className="flex flex-col h-screen">
+            <Alerts />
             {contents.includes("navbar") && <Navbar />}
 
             <div className="flex flex-1 min-h-0">

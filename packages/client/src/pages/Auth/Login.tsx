@@ -83,6 +83,9 @@ export function LoginContent() {
                     Login
                 </button>
 
+                <div className="flex justify-end text-sm text-gray-400 mt-2 gap-1">
+                    Don't have an account? <a href="/register" className="text-orange-500">Sign up</a>
+                </div>
             </div>
 
         </>

@@ -66,6 +66,10 @@ router.post("/request-token", requireAuth, async (req, res) => {
     .select()
     .from(usersTable)
     .where(eq(usersTable.id, req.user!.id));
+  if (user.emailVerified)
+    return res
+      .status(400)
+      .json({ success: false, message: "Email already verified" });
   await createToken(user.email);
 
   return res.status(200).json({ success: true });

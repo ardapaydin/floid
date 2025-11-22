@@ -97,6 +97,9 @@ export function RegisterContent() {
                     <User className="w-5" />
                     Register
                 </button>
+                <div className="flex justify-end text-sm text-gray-400 mt-2 gap-1">
+                    Don you have an account? <a href="/login" className="text-orange-500">Sign In</a>
+                </div>
 
             </div>
 
