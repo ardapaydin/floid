@@ -2,11 +2,12 @@ import type { Community } from "@/types/community";
 import { joinCommunity, leaveCommunity, useCommunities } from "@/utils/api/community";
 import { CommunityIcon } from "./Icon";
 import hasPermission from "@/utils/permissions/check";
-import { Settings } from "lucide-react";
+import { Settings, UserPlus } from "lucide-react";
 import CommunitySettings from "../Dialogs/Settings/Settings";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/utils/api/users";
+import InviteDialog from "@/components/Dialogs/Community/Invite";
 
 export default function Header({ community }: { community: Community }) {
     const communities = useCommunities();
@@ -41,6 +42,13 @@ export default function Header({ community }: { community: Community }) {
                         className="mt-4 w-32 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg border-orange-500 border-2 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                         Create Post
                     </button>
+                    {community.visibility == "private" && hasPermission(community.permissions, "MANAGE_COMMUNITY") && (
+                        <InviteDialog>
+                            <button className="mt-4 px-2 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg border-orange-500 border-2 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                                <UserPlus />
+                            </button>
+                        </InviteDialog>
+                    )}
 
                     {hasPermission(community.permissions, "MANAGE_COMMUNITY") && (
                         <CommunitySettings>

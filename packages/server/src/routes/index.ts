@@ -5,6 +5,7 @@ import UsersRouter from "./users";
 import FeedRouter from "./feed";
 import ExploreRouter from "./explore";
 import CommunitiesRouter from "./communities";
+import InvitesRouter from "./invites";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
 import { count, eq } from "drizzle-orm";
@@ -35,5 +36,6 @@ router.use("/users", UsersRouter);
 router.use("/community", CommunitiesRouter);
 router.use("/feed", FeedRouter);
 router.use("/explore", ExploreRouter);
+router.use("/invites", InvitesRouter);
 
 export default router;

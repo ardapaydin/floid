@@ -15,6 +15,7 @@ import CommentsRouter from "./comments";
 import PostsRouter from "./posts";
 import MembersRouter from "./members";
 import RulesRouter from "./rules";
+import InvitesRouter from "./invites";
 import AttachmentsRouter from "./attachments";
 import RolesRouter from "./roles";
 import { lower } from "../../../database/custom/lower";
@@ -214,5 +215,6 @@ router.use(PostsRouter);
 router.use(RulesRouter);
 router.use(AttachmentsRouter);
 router.use(RolesRouter);
+router.use(InvitesRouter);
 
 export default router;

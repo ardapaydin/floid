@@ -74,3 +74,20 @@ export function joinCommunity(name: string) {
 export function leaveCommunity(name: string) {
   return axios.post("/community/" + name + "/leave");
 }
+
+export function useGenerateInviteLink(
+  name: string,
+  enabled: boolean,
+  maxUses: number
+) {
+  return useQuery({
+    queryKey: ["community", name, "invites", "maxUses", maxUses],
+    queryFn: async () => {
+      const r = await axios.post("/community/" + name + "/invites", {
+        maxUses,
+      });
+      return r.data;
+    },
+    enabled,
+  });
+}
