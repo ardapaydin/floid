@@ -2,12 +2,9 @@ import { count, eq } from "drizzle-orm";
 import { db } from "../../database/db";
 import { commentsTable, followersTable } from "../../database";
 import { setCommentDetails } from "../../helpers/details/comment";
-import {
-  VOTE_IMPACT_FOR_FOLLOWERS_WEIGHT,
-  VOTE_IMPACT_FOR_REPUTATION_WEIGHT,
-} from "../weights";
+import { COMMENT_WEIGHT } from "../weights";
 
-export async function voteImpact(userId: string) {
+export async function commentImpact(userId: string) {
   const [followers] = await db
     .select({ count: count() })
     .from(followersTable)
@@ -23,8 +20,5 @@ export async function voteImpact(userId: string) {
     rep += (comment as any).votes;
   }
 
-  return (
-    VOTE_IMPACT_FOR_FOLLOWERS_WEIGHT * followers.count +
-    VOTE_IMPACT_FOR_REPUTATION_WEIGHT * rep
-  );
+  return (followers.count + rep) / 5 + COMMENT_WEIGHT;
 }

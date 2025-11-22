@@ -9,13 +9,15 @@ import {
   communitiesTable,
   voteTable,
 } from "../../../../../database";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { createCommentSchema } from "../../../../../helpers/validations/communities/comment/create";
 import post from "../../../../../helpers/db/selects/post";
 import { setCommentDetails } from "../../../../../helpers/details/comment";
 import getPermissions from "../../../../../helpers/permissions/getPermissions";
 import hasPermission from "../../../../../helpers/permissions/hasPermission";
 import { voteImpact } from "../../../../../algorithm/calculate/voteImpact";
+import { COMMENT_DELETED_BY_MOD_WEIGHT } from "../../../../../algorithm/weights";
+import { commentImpact } from "../../../../../algorithm/calculate/commentImpact";
 const router = express.Router();
 
 router.post(
@@ -47,28 +49,50 @@ router.post(
       return res
         .status(404)
         .json({ success: false, message: "comment not found" });
-
-    if (comment.relatedTo) {
-      const [related] = await db
-        .select()
-        .from(commentsTable)
-        .where(
-          and(
-            eq(commentsTable.id, comment.relatedTo),
-            eq(commentsTable.communityId, community.id)
-          )
-        );
-
-      if (related.deleted)
-        return res
-          .status(400)
-          .json({ success: false, message: "cannot reply to deleted posts" });
-    }
-
     if (comment.deleted)
       return res
         .status(400)
         .json({ success: false, message: "cannot reply to deleted comments" });
+    const [related] = await db
+      .select()
+      .from(commentsTable)
+      .where(
+        and(
+          eq(commentsTable.id, comment.post ? comment.id : comment.relatedTo!),
+          eq(commentsTable.communityId, community.id)
+        )
+      );
+
+    if (comment.relatedTo && related.deleted)
+      return res
+        .status(400)
+        .json({ success: false, message: "cannot reply to deleted posts" });
+
+    const [findcomment] = await db
+      .select()
+      .from(commentsTable)
+      .where(
+        and(
+          eq(commentsTable.createdBy, req.user!.id),
+          eq(commentsTable.communityId, community.id),
+          eq(
+            commentsTable.relatedTo,
+            comment.post ? comment.id : comment.relatedTo!
+          ),
+          eq(commentsTable.post, false)
+        )
+      );
+    if (!findcomment) {
+      const impact = await commentImpact(req.user!.id);
+      await db
+        .update(commentsTable)
+        .set({
+          score: related.score + impact,
+        })
+        .where(
+          eq(commentsTable.id, comment.post ? comment.id : comment.relatedTo!)
+        );
+    }
 
     const [create] = await db
       .insert(commentsTable)
@@ -197,7 +221,6 @@ router.post(
         if (vote == "up") score += impact;
         if (vote == "down") score -= impact;
       }
-      console.log(score, impact);
       await db
         .update(commentsTable)
         .set({
@@ -252,6 +275,28 @@ router.delete("/:name/comments/:commentId", requireAuth, async (req, res) => {
       success: false,
       message: "you dont have permission to delete this comment",
     });
+
+  if (!comment.post && comment.relatedTo && comment.createdBy) {
+    const [related] = await db
+      .select()
+      .from(commentsTable)
+      .where(eq(commentsTable.id, comment.relatedTo));
+
+    const impact = await commentImpact(comment.createdBy);
+    let del = impact;
+    if (
+      hasPermission(permissions, "MANAGE_COMMUNITY") &&
+      comment.createdBy != req.user?.id
+    )
+      del = del * COMMENT_DELETED_BY_MOD_WEIGHT;
+
+    await db
+      .update(commentsTable)
+      .set({
+        score: related.score - del,
+      })
+      .where(eq(commentsTable.id, related.id));
+  }
 
   await db
     .update(commentsTable)
