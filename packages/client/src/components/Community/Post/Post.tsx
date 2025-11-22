@@ -28,7 +28,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
 
     const votepost = async (vote: ("up" | "down" | null)) => {
         commentStore.voteComment(post.id, vote)
-        await votePost(name!, post.id, vote);
+        await votePost("community" in post ? post.community.name : name!, post.id, vote);
     }
 
     return (

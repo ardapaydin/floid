@@ -15,6 +15,7 @@ import post from "../../../../../helpers/db/selects/post";
 import { setCommentDetails } from "../../../../../helpers/details/comment";
 import getPermissions from "../../../../../helpers/permissions/getPermissions";
 import hasPermission from "../../../../../helpers/permissions/hasPermission";
+import { voteImpact } from "../../../../../algorithm/calculate/voteImpact";
 const router = express.Router();
 
 router.post(
@@ -143,17 +144,17 @@ router.post(
         success: false,
         message: "cannot upvote/downvote deleted comments",
       });
-    if (vote) {
-      const [findvote] = await db
-        .select()
-        .from(voteTable)
-        .where(
-          and(
-            eq(voteTable.commentId, commentId),
-            eq(voteTable.userId, req.user!.id)
-          )
-        );
+    const [findvote] = await db
+      .select()
+      .from(voteTable)
+      .where(
+        and(
+          eq(voteTable.commentId, commentId),
+          eq(voteTable.userId, req.user!.id)
+        )
+      );
 
+    if (vote) {
       if (!findvote)
         await db.insert(voteTable).values({
           commentId: commentId,
@@ -183,6 +184,27 @@ router.post(
             eq(voteTable.userId, req.user!.id)
           )
         );
+    const impact = await voteImpact(req.user?.id!);
+
+    if (comment.post) {
+      let score = comment.score;
+      if (findvote) {
+        if (findvote.type == "up" && vote == "down") score -= impact * 2;
+        if (findvote.type == "down" && vote == "up") score += impact * 2;
+        if (findvote.type == "down" && vote == null) score += impact;
+        if (findvote.type == "up" && vote == null) score -= impact;
+      } else if (vote) {
+        if (vote == "up") score += impact;
+        if (vote == "down") score -= impact;
+      }
+      console.log(score, impact);
+      await db
+        .update(commentsTable)
+        .set({
+          score,
+        })
+        .where(eq(commentsTable.id, comment.id));
+    }
 
     const allvotes = await db
       .select({ type: voteTable.type })
