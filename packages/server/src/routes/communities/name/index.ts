@@ -15,6 +15,7 @@ import CommentsRouter from "./comments";
 import PostsRouter from "./posts";
 import MembersRouter from "./members";
 import RulesRouter from "./rules";
+import AttachmentsRouter from "./attachments";
 import { lower } from "../../../database/custom/lower";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import FileValidationMiddleware from "../../../helpers/middlewares/FileValidation";
@@ -207,5 +208,6 @@ router.use(CommentsRouter);
 router.use(MembersRouter);
 router.use(PostsRouter);
 router.use(RulesRouter);
+router.use(AttachmentsRouter);
 
 export default router;

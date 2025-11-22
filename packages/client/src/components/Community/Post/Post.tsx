@@ -12,6 +12,7 @@ import { commentStore } from "@/store/commentStore";
 import UserPart from "./Parts/User";
 import type { Community } from "@/types/community";
 import CommentDropdownMenu from "@/components/Dropdown/Comment";
+import { Attachments } from "./Parts/Attachments";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -90,7 +91,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
 
             {comment.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
             {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
-
+            {comment.attachments && <Attachments post={comment} />}
             {comment.deleted && (
                 <div className="border p-4 border-[#444] rounded-lg gap-2 flex items-center px-6">
                     <Trash className="text-red-400" />

@@ -4,11 +4,12 @@ import BodyValidationMiddleware from "../../../../helpers/middlewares/BodyValida
 import { createPostSchema } from "../../../../helpers/validations/communities/post/create";
 import { db } from "../../../../database/db";
 import {
+  attachmentsTable,
   commentsTable,
   communitiesTable,
   voteTable,
 } from "../../../../database";
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray } from "drizzle-orm";
 import post from "../../../../helpers/db/selects/post";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
@@ -136,12 +137,29 @@ router.post(
   (req, res, next) =>
     BodyValidationMiddleware(req, res, next, createPostSchema),
   async (req, res) => {
-    const { title, content, tags, attachments } = req.body;
+    let { title, content, tags, attachments } = req.body;
     const { name } = req.params;
     const [findCommunity] = await db
       .select()
       .from(communitiesTable)
       .where(eq(communitiesTable.name, name));
+    attachments = [...new Set(attachments)];
+    const findattachments = await db
+      .select()
+      .from(attachmentsTable)
+      .where(
+        and(
+          inArray(attachmentsTable.id, attachments),
+          eq(attachmentsTable.type, "attachments"),
+          eq(attachmentsTable.uploadedBy, req.user?.id!)
+        )
+      );
+
+    if (findattachments.length != attachments.length)
+      return res.status(400).json({
+        success: false,
+        message: "One or more attachments do not exist",
+      });
 
     const [{ id }] = await db
       .insert(commentsTable)
@@ -149,7 +167,10 @@ router.post(
         title,
         content,
         tags,
-        attachments,
+        attachments: findattachments.map((attachment) => ({
+          id: attachment.id,
+          url: attachment.key,
+        })),
         communityId: findCommunity.id,
         score: 0,
         createdBy: req.user!.id,

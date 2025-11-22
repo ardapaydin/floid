@@ -58,3 +58,7 @@ export function votePost(
     vote,
   });
 }
+
+export function uploadAttachment(name: string, formdata: FormData) {
+  return axios.post("/community/" + name + "/attachments", formdata);
+}
