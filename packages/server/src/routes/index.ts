@@ -9,6 +9,7 @@ import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
 import { count, eq } from "drizzle-orm";
 import { usersTable } from "../database";
+import { render } from "@react-email/components";
 
 router.use(async (req, res, next) => {
   const header = req.headers.authorization;
@@ -35,5 +36,14 @@ router.use("/users", UsersRouter);
 router.use("/community", CommunitiesRouter);
 router.use("/feed", FeedRouter);
 router.use("/explore", ExploreRouter);
+
+import EmailLayout from "../email/templates/layout";
+import React from "react";
+router.get("/email/test", async (_req, res) => {
+  const html = await render(
+    React.createElement(EmailLayout, null, "<div>test</div>")
+  );
+  return res.send(html);
+});
 
 export default router;

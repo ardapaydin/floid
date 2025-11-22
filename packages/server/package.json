@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.935.0",
+    "@react-email/components": "^1.0.1",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
@@ -28,6 +29,7 @@
     "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
+    "react-email": "^5.0.5",
     "zod": "^4.1.12"
   }
 }
