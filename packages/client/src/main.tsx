@@ -6,6 +6,7 @@ import axios from 'axios'
 import { BrowserRouter } from 'react-router-dom'
 import "./app.css"
 import { getToken, isAuthenicated } from './utils/auth/user.ts'
+import { Toaster } from 'react-hot-toast'
 if (process.env.NODE_ENV === "production") axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 else axios.defaults.baseURL = "/api"
 if (isAuthenicated()) axios.defaults.headers.common.Authorization = "Bearer " + getToken()
@@ -25,6 +26,12 @@ createRoot(document.body).render(
       }
     })}>
       <BrowserRouter>
+        <Toaster toastOptions={{
+          style: {
+            backgroundColor: "#333",
+            color: "white"
+          }
+        }} />
         <App />
       </BrowserRouter>
     </QueryClientProvider>

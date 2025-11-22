@@ -11,5 +11,8 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "lerna": "^9.0.0"
+  },
+  "dependencies": {
+    "react-hot-toast": "^2.6.0"
   }
 }

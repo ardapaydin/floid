@@ -12,8 +12,10 @@ import {
 import { loginSchema } from "../../helpers/validations/auth/login";
 import { requireNoAuth } from "../../helpers/middlewares/Auth";
 import { signToken } from "../../helpers/auth/jwt";
+import { createToken } from "../../email/verification/generateToken";
+import EmailRouter from "./email";
 const router = express.Router();
-
+router.use(EmailRouter);
 router.post(
   "/register",
   requireNoAuth,
@@ -45,7 +47,13 @@ router.post(
       .select({ find: count(usersTable.id) })
       .from(usersTable)
       .where(eq(usersTable.username, username));
-    if (!findUsername || !username.trim()) username = createId();
+    if (findUsername.find)
+      return res.status(400).json({
+        success: false,
+        message: "Username exists",
+        errors: { username: ["Username already exists"] },
+      });
+    if (!findUsername.find || !username.trim()) username = createId();
 
     const [{ id }] = await db
       .insert(usersTable)
@@ -57,13 +65,14 @@ router.post(
       })
       .$returningId();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: {
         userId: id,
         token: signToken(id),
       },
     });
+    await createToken(email);
   }
 );
 

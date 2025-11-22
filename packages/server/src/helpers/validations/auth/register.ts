@@ -2,7 +2,7 @@ import z from "zod";
 
 export const registerSchema = z.object({
   username: z.string().max(32),
-  email: z.email(),
+  email: z.email().toLowerCase(),
   password: z
     .string()
     .regex(

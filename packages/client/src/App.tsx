@@ -8,6 +8,7 @@ import Submit from "./pages/Community/Submit";
 import Comment from "./pages/Community/Comment";
 import User from "./pages/User/Main";
 import Loading from "./components/Loading/Loading";
+import VerifyEmail from "./pages/Auth/VerifyEmail";
 
 function App() {
   const user = useUser()
@@ -19,6 +20,7 @@ function App() {
       <Route path="/c/:name/submit" element={<Submit />} />
       <Route path="/c/:name/comments/:commentId" element={<Comment />} />
       <Route path="/u/:name" element={<User />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>
