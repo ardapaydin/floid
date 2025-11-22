@@ -1,14 +1,28 @@
 import type { Community } from "@/types/community";
-import { useCommunities } from "@/utils/api/community";
+import { joinCommunity, leaveCommunity, useCommunities } from "@/utils/api/community";
 import { CommunityIcon } from "./Icon";
 import hasPermission from "@/utils/permissions/check";
 import { Settings } from "lucide-react";
 import CommunitySettings from "../Dialogs/Settings/Settings";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/utils/api/users";
 
 export default function Header({ community }: { community: Community }) {
     const communities = useCommunities();
+    const user = useUser();
     const nav = useNavigate();
+    const qc = useQueryClient();
+    const join = async () => {
+        const r = await joinCommunity(community.name);
+        if (r.status == 200) qc.setQueryData(["communities"], (old: Community[]) => ([...old, community]))
+    }
+
+    const leave = async () => {
+        const r = await leaveCommunity(community.name);
+        if (r.status == 200) qc.setQueryData(["communities"], (old: Community[]) => (old.filter(x => x.id != community.id)))
+    }
+
     return (
         <div className="flex flex-col relative">
             <div className="w-full bg-[#222] h-32 rounded-lg" >
@@ -37,8 +51,17 @@ export default function Header({ community }: { community: Community }) {
                     )}
 
                     {!communities.data?.find((x) => x.id == community.id) && (
-                        <button className="mt-4 w-16 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                        <button
+                            onClick={() => join()}
+                            className="mt-4 w-16 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                             Join
+                        </button>
+                    ) || (community.creator != user.data?.user?.id) && (
+                        <button
+                            onClick={() => leave()}
+                            className="mt-4 w-16 justify-center items-center flex disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition"
+                        >
+                            Leave
                         </button>
                     )}
                 </div>

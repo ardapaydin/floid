@@ -66,3 +66,11 @@ export function uploadIcon(name: string, form: FormData) {
 export function uploadBanner(name: string, form: FormData) {
   return axios.put("/community/" + name + "/banner", form);
 }
+
+export function joinCommunity(name: string) {
+  return axios.post("/community/" + name + "/join");
+}
+
+export function leaveCommunity(name: string) {
+  return axios.post("/community/" + name + "/leave");
+}
