@@ -1,3 +1,4 @@
+import type { Ban } from "@/types/ban";
 import type { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,6 +16,16 @@ export function useMembersSearch(name: string, query: string | null) {
   });
 }
 
+export function useBannedMembers(name: string) {
+  return useQuery({
+    queryKey: ["communities", name, "members", "ban"],
+    queryFn: async () => {
+      const r = await axios.get("/community/" + name + "/bans");
+      return r.data as Ban[];
+    },
+  });
+}
+
 export function banMember(
   name: string,
   memberId: string,
@@ -25,4 +36,8 @@ export function banMember(
     reason,
     expiresAt,
   });
+}
+
+export function unbanMember(name: string, memebrId: string) {
+  return axios.delete("/community/" + name + "/members/" + memebrId + "/ban");
 }

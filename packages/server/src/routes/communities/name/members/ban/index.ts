@@ -12,11 +12,13 @@ import {
 import { and, eq, inArray } from "drizzle-orm";
 import RequirePermission from "../../../../../helpers/middlewares/RequirePermission";
 import user from "../../../../../helpers/db/selects/user";
+import CanAccessCommunity from "../../../../../helpers/middlewares/CanAccessCommunity";
 const router = express.Router();
 
 router.get(
   "/:name/bans",
   requireAuth,
+  CanAccessCommunity,
   (req, res, next) => RequirePermission(req, res, next, "MANAGE_MEMBERS"),
   async (req, res) => {
     const { name } = req.params;
@@ -49,6 +51,7 @@ router.get(
 router.post(
   "/:name/members/:memberId/ban",
   requireAuth,
+  CanAccessCommunity,
   (req, res, next) => BodyValidationMiddleware(req, res, next, banMemberSchema),
   (req, res, next) => RequirePermission(req, res, next, "MANAGE_MEMBERS"),
   async (req, res) => {
@@ -116,6 +119,37 @@ router.post(
         )
       );
 
+    return res.status(200).json({ success: true });
+  }
+);
+
+router.delete(
+  "/:name/members/:memberId/ban",
+  requireAuth,
+  CanAccessCommunity,
+  (req, res, next) => RequirePermission(req, res, next, "MANAGE_MEMBERS"),
+  async (req, res) => {
+    const { name, memberId } = req.params;
+
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+
+    const [ban] = await db
+      .select()
+      .from(banTable)
+      .where(
+        and(
+          eq(banTable.userId, memberId),
+          eq(banTable.communityId, community.id)
+        )
+      );
+
+    if (!ban)
+      return res.status(400).json({ success: false, message: "Ban not found" });
+
+    await db.delete(banTable).where(eq(banTable.id, ban.id));
     return res.status(200).json({ success: true });
   }
 );
