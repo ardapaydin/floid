@@ -13,6 +13,7 @@ import { requireAuth } from "../../../../helpers/middlewares/Auth";
 import roleRouter from "./role";
 import RequirePermission from "../../../../helpers/middlewares/RequirePermission";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
+import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
 const router = express.Router();
 router.use(roleRouter);
 router.post(
@@ -104,69 +105,78 @@ router.get(
   }
 );
 
-router.post("/:name/join", requireAuth, async (req, res) => {
-  const { name } = req.params;
-  const [community] = await db
-    .select()
-    .from(communitiesTable)
-    .where(eq(communitiesTable.name, name));
+router.post(
+  "/:name/join",
+  requireAuth,
+  CanAccessCommunity,
+  async (req, res) => {
+    const { name } = req.params;
+    const [community] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+    const [member] = await db
+      .select()
+      .from(communityMembersTable)
+      .where(
+        and(
+          eq(communityMembersTable.userId, req.user!.id),
+          eq(communityMembersTable.communityId, community.id)
+        )
+      );
 
-  const [member] = await db
-    .select()
-    .from(communityMembersTable)
-    .where(
-      and(
-        eq(communityMembersTable.userId, req.user!.id),
-        eq(communityMembersTable.communityId, community.id)
-      )
-    );
+    if (member)
+      return res
+        .status(409)
+        .json({ success: false, message: "already member of community" });
 
-  if (member)
-    return res
-      .status(409)
-      .json({ success: false, message: "already member of community" });
-
-  await db.insert(communityMembersTable).values({
-    userId: req.user!.id,
-    communityId: community.id,
-  });
-
-  return res.status(200).json({ success: true });
-});
-
-router.post("/:name/leave", requireAuth, async (req, res) => {
-  const { name } = req.params;
-  const [communiy] = await db
-    .select()
-    .from(communitiesTable)
-    .where(eq(communitiesTable.name, name));
-
-  const [find] = await db
-    .select()
-    .from(communityMembersTable)
-    .where(
-      and(
-        eq(communityMembersTable.userId, req.user!.id),
-        eq(communityMembersTable.communityId, communiy.id)
-      )
-    );
-
-  if (!find)
-    return res
-      .status(400)
-      .json({ success: false, message: "not member of this community" });
-
-  if (req.user!.id == communiy.creator)
-    return res.status(400).json({
-      success: false,
-      message: "cannot leave from your own community",
+    await db.insert(communityMembersTable).values({
+      userId: req.user!.id,
+      communityId: community.id,
     });
 
-  await db
-    .delete(communityMembersTable)
-    .where(eq(communityMembersTable.id, find.id));
+    return res.status(200).json({ success: true });
+  }
+);
 
-  return res.status(200).json({ success: true });
-});
+router.post(
+  "/:name/leave",
+  requireAuth,
+  CanAccessCommunity,
+  async (req, res) => {
+    const { name } = req.params;
+    const [communiy] = await db
+      .select()
+      .from(communitiesTable)
+      .where(eq(communitiesTable.name, name));
+
+    const [find] = await db
+      .select()
+      .from(communityMembersTable)
+      .where(
+        and(
+          eq(communityMembersTable.userId, req.user!.id),
+          eq(communityMembersTable.communityId, communiy.id)
+        )
+      );
+
+    if (!find)
+      return res
+        .status(400)
+        .json({ success: false, message: "not member of this community" });
+
+    if (req.user!.id == communiy.creator)
+      return res.status(400).json({
+        success: false,
+        message: "cannot leave from your own community",
+      });
+
+    await db
+      .delete(communityMembersTable)
+      .where(eq(communityMembersTable.id, find.id));
+
+    return res.status(200).json({ success: true });
+  }
+);
 
 export default router;

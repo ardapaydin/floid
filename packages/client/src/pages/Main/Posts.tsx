@@ -23,7 +23,7 @@ export function MainPosts() {
 
             {posts.isLoading && <Loading />}
             {!posts.isLoading && posts.data?.pages?.flatMap(page => page.posts).map((post => (
-                <ObserverPost section="user" key={post.id} post={post} />
+                <ObserverPost section="feed" key={post.id} post={post} />
             )))}
             {posts?.hasNextPage && (
                 <div
