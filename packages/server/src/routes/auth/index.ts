@@ -10,10 +10,11 @@ import {
   EncryptPassword,
 } from "../../helpers/encryptions/password";
 import { loginSchema } from "../../helpers/validations/auth/login";
-import { requireNoAuth } from "../../helpers/middlewares/Auth";
+import { requireAuth, requireNoAuth } from "../../helpers/middlewares/Auth";
 import { signToken } from "../../helpers/auth/jwt";
 import { createToken } from "../../email/verification/generateToken";
 import EmailRouter from "./email";
+import { loggedOutTokensTable } from "../../database/schemas/loggedOut";
 const router = express.Router();
 router.use(EmailRouter);
 router.post(
@@ -113,5 +114,11 @@ router.post(
     });
   }
 );
+
+router.post("/logout", requireAuth, async (req, res) => {
+  const token = req.headers["authorization"]?.split(" ")?.[1]!;
+  await db.insert(loggedOutTokensTable).values({ token });
+  return res.status(200).json({ success: true });
+});
 
 export default router;

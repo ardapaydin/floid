@@ -23,3 +23,7 @@ export function useVerifyEmail(token: string | null) {
 export function requestVerifyToken() {
   return axios.post("/auth/request-token");
 }
+
+export function logout() {
+  return axios.post("/auth/logout");
+}

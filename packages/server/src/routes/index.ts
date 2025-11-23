@@ -9,13 +9,20 @@ import InvitesRouter from "./invites";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
 import { and, count, eq, isNull } from "drizzle-orm";
-import { usersTable } from "../database";
+import { loggedOutTokensTable, usersTable } from "../database";
 
 router.use(async (req, res, next) => {
   const header = req.headers.authorization;
   if (header && header.startsWith("Bearer")) {
     try {
       const { id } = verifyToken(header.split(" ")[1]);
+
+      const [findtoken] = await db
+        .select()
+        .from(loggedOutTokensTable)
+        .where(eq(loggedOutTokensTable.token, header.split(" ")[1]));
+      if (findtoken) return next();
+
       const [{ value }] = await db
         .select({ value: count() })
         .from(usersTable)
