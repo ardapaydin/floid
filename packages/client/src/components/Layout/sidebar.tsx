@@ -38,7 +38,7 @@ export function Sidebar() {
                     </>
                 )}
 
-                {(Array.isArray(communities.data) && Boolean(communities.data.length)) && (
+                {(Array.isArray(communities.data) && Boolean(communities.data.filter(x => x.role == "mod" || x.role == "owner").length)) && (
                     <>
                         <hr className="mt-4 mb-4 border-gray-800/50" />
                         <div className="flex flex-col xl:mx-4">

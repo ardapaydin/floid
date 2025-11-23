@@ -4,7 +4,9 @@ import ObserverPost from "@/components/Community/Post/Post";
 import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
 import { commentStore } from "@/store/commentStore";
+import { addRecentPost } from "@/store/recentPosts";
 import { userStore } from "@/store/userStore";
+import type { Community } from "@/types/community";
 import type { Post } from "@/types/post";
 import { replyComment } from "@/utils/api/comment";
 import { useCommunityByName } from "@/utils/api/community";
@@ -26,7 +28,8 @@ export default function Comment() {
             const userIds = [post.data.post.createdBy, ...post.data.replies.map((x) => x.createdBy)];
             userStore.getUsersBulk(name!, [...new Set(userIds)]);
         }
-    }, [post.data, name])
+        addRecentPost({ ...post.data.post, community: community.data as Community })
+    }, [post.data, name, community.data])
     if (!community.data || !post.data) return <Layout><Loading /></Layout>
 
     return (
