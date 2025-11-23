@@ -1,8 +1,12 @@
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { useUser } from "@/utils/api/users";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
     const nav = useNavigate();
+    const user = useUser();
+    if (!user.isLoading && !user.data?.user) return <Navigate to={"/login"} />
+
     return (
         <div className="flex flex-col gap-2 py-8">
             <h1 className="text-2xl font-bold text-white/50">Settings</h1>

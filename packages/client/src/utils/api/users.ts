@@ -61,3 +61,14 @@ export function blockUser(name: string) {
 export function unblockUser(name: string) {
   return axios.delete("/users/" + name + "/block");
 }
+
+export function useBlockedUsers(enabled: boolean) {
+  return useQuery({
+    queryKey: ["users", "me", "blocked"],
+    queryFn: async () => {
+      const r = await axios.get("/users/me/blocked");
+      return r.data as User[];
+    },
+    enabled,
+  });
+}

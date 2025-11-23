@@ -6,8 +6,28 @@ import {
   followersTable,
   usersTable,
 } from "../../../database";
-import { and, eq, or } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
+import user from "../../../helpers/db/selects/user";
 const router = express.Router();
+
+router.get("/me/blocked", requireAuth, async (req, res) => {
+  const blocked = await db
+    .select()
+    .from(blockedUsersTable)
+    .where(eq(blockedUsersTable.blockedBy, req.user!.id));
+
+  const users = await db
+    .select(user)
+    .from(usersTable)
+    .where(
+      inArray(
+        usersTable.id,
+        blocked.map((x) => x.blockedUser)
+      )
+    );
+
+  return res.status(200).json(users);
+});
 
 router.post("/:name/block", requireAuth, async (req, res) => {
   const { name } = req.params;
