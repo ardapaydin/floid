@@ -56,7 +56,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                 if (section == "posts") nav("/c/" + name + "/comments/" + post.id)
                 if (("community" in post) && (section == "feed" || section == "user")) nav("/c/" + post.community.name + "/comments/" + (post.relatedTo ? post.relatedTo : post.id))
             }}
-            className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", (section !== "posts") ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
+            className={cn("flex flex-col gap-2 w-full border-[#3b3b3b] px-3 py-4 transition rounded", (section !== "post") ? "border-t border-b hover:bg-[#333]/20 cursor-pointer" : "")}
         >
             <div className="flex justify-between">
                 <div className="flex items-center gap-2 font-semibold text-muted-foreground text-sm">

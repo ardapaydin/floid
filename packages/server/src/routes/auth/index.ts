@@ -22,7 +22,7 @@ router.post(
   requireNoAuth,
   (req, res, next) => BodyValidationMiddleware(req, res, next, registerSchema),
   async (req, res) => {
-    const { email, password, username: displayName } = req.body;
+    const { email, password, username } = req.body;
 
     const [findEmail] = await db
       .select({ find: count(usersTable.id) })
@@ -35,15 +35,6 @@ router.post(
         errors: { email: ["Email already registered."] },
       });
 
-    let username = (displayName ?? "")
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
-      .replace(/-+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
     const [findUsername] = await db
       .select({ find: count(usersTable.id) })
       .from(usersTable)
@@ -54,13 +45,12 @@ router.post(
         message: "Username exists",
         errors: { username: ["Username already exists"] },
       });
-    if (!findUsername.find || !username.trim()) username = createId();
 
     const [{ id }] = await db
       .insert(usersTable)
       .values({
         username,
-        displayName,
+        displayName: username,
         email,
         password: EncryptPassword(password),
       })

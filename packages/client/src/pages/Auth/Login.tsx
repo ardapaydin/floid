@@ -13,7 +13,7 @@ export default function Login() {
         <div className="flex h-screen w-screen items-center justify-center">
             <div className="absolute top-0 z-[-2] h-screen w-screen bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,165,0,0.3),rgba(255,255,255,0))]" />
             <div className="px-2 w-screen h-screen justify-center items-center flex">
-                <div className="bg-[#363636] p-8 2xl:w-1/4 rounded-lg flex flex-col gap-4">
+                <div className="bg-[#363636] p-8 max-w-lg w-full mx-auto rounded-lg flex flex-col gap-4">
                     <LoginContent />
                 </div>
             </div>

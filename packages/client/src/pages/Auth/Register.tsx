@@ -12,7 +12,7 @@ export default function Register() {
         <div className="flex h-screen w-screen items-center justify-center">
             <div className="absolute top-0 z-[-2] h-screen w-screen bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,165,0,0.3),rgba(255,255,255,0))]" />
             <div className="px-2 w-screen h-screen justify-center items-center flex">
-                <div className="bg-[#363636] p-8 2xl:w-1/4 rounded-lg flex flex-col gap-4">
+                <div className="bg-[#363636] p-8 max-w-lg w-full mx-auto rounded-lg flex flex-col gap-4">
                     <RegisterContent />
                 </div>
             </div>
@@ -38,7 +38,7 @@ export function RegisterContent() {
     }
 
     const validate = () => {
-        if (!form.username.trim() || !form.password.trim() || !form.email.trim() || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/.test(form.email)) return false;
+        if (!form.username.trim() || !form.password.trim() || !form.email.trim() || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/.test(form.email) || !/^[a-zA-Z0-9]+$/.test(form.username)) return false;
         return true;
     }
 
@@ -51,11 +51,12 @@ export function RegisterContent() {
                     <label className="text font-bold">Username</label>
                     {errors.username && <p className="text-red-400">{errors.username[0]}</p>}
                     <input
-                        value={form.username}
-                        onChange={(e) => setForm({ ...form, username: e.target.value })}
+                        value={form.username.toLowerCase()}
+                        onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase() })}
                         placeholder="Username"
                         className="px-4 py-3 rounded-lg bg-[#313131] border-b-3 border-[#242323] text-white focus:outline-none focus:ring-2 focus:ring-orange-400/50 transition"
                     />
+                    <p className="text-xs text-white/50">Username can only contain letters and numbers. You cannot change this after registration.</p>
                 </div>
                 <div className="flex flex-col gap-1">
                     <label className="text font-bold">Email</label>
