@@ -11,11 +11,13 @@ import {
 import { and, eq, inArray, like, or } from "drizzle-orm";
 import { requireAuth } from "../../../../helpers/middlewares/Auth";
 import roleRouter from "./role";
+import banRouter from "./ban";
 import RequirePermission from "../../../../helpers/middlewares/RequirePermission";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
 const router = express.Router();
 router.use(roleRouter);
+router.use(banRouter);
 router.post(
   "/:name/members/details",
   (req, res, next) =>

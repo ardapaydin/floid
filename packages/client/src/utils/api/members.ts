@@ -14,3 +14,15 @@ export function useMembersSearch(name: string, query: string | null) {
     enabled: Boolean(query),
   });
 }
+
+export function banMember(
+  name: string,
+  memberId: string,
+  reason: string,
+  expiresAt: string
+) {
+  return axios.post("/community/" + name + "/members/" + memberId + "/ban", {
+    reason,
+    expiresAt,
+  });
+}

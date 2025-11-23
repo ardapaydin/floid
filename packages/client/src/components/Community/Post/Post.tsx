@@ -15,6 +15,7 @@ import CommentDropdownMenu from "@/components/Dropdown/Comment";
 import { Attachments } from "./Parts/Attachments";
 import { useUser } from "@/utils/api/users";
 import { useQueryClient } from "@tanstack/react-query";
+import { MemberContextMenu } from "@/components/ContextMenu/Member";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user" | "feed"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -61,13 +62,19 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
             <div className="flex justify-between">
                 <div className="flex items-center gap-2 font-semibold text-muted-foreground text-sm">
                     {section == "posts" && (
-                        <UserPart user={user} />
+                        <MemberContextMenu community={name!} member={user}>
+                            <div>
+                                <UserPart user={user} />
+                            </div>
+                        </MemberContextMenu>
                     ) || (section == "post" && (
                         <div className="flex gap-2 cursor-pointer" onClick={() => nav("/c/" + community.data?.name)}>
                             <CommunityIcon community={community.data!} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
                             <div className="flex flex-col">
                                 <h1 className="text-white/90">c/{community.data!.name}</h1>
-                                <span className="cursor-pointer hover:text-white transition-all" onClick={() => nav("/u/" + user?.username)}>{user?.displayName}</span>
+                                <MemberContextMenu community={community.data!.name} member={user}>
+                                    <span className="cursor-pointer hover:text-white transition-all" onClick={() => nav("/u/" + user?.username)}>{user?.displayName}</span>
+                                </MemberContextMenu>
                             </div>
                         </div>
                     ))}
