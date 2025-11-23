@@ -49,3 +49,7 @@ export function unfollowUser(name: string) {
 export function updateUser(data: Record<string, string>) {
   return axios.post("/users/me", data);
 }
+
+export function deleteUser(password: string) {
+  return axios.delete("/users/me", { data: { password } });
+}

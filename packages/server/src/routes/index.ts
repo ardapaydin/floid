@@ -8,7 +8,7 @@ import CommunitiesRouter from "./communities";
 import InvitesRouter from "./invites";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
-import { count, eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import { usersTable } from "../database";
 
 router.use(async (req, res, next) => {
@@ -19,7 +19,7 @@ router.use(async (req, res, next) => {
       const [{ value }] = await db
         .select({ value: count() })
         .from(usersTable)
-        .where(eq(usersTable.id, id));
+        .where(and(eq(usersTable.id, id), isNull(usersTable.status)));
       if (value) {
         res.setHeader("X-User-Id", id);
         req.user = { id };

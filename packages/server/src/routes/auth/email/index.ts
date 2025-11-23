@@ -70,7 +70,7 @@ router.post("/request-token", requireAuth, async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Email already verified" });
-  await createToken(user.email);
+  await createToken(user.email!);
 
   return res.status(200).json({ success: true });
 });

@@ -1,6 +1,11 @@
 import express from "express";
 import { db } from "../../database/db";
-import { attachmentsTable, usersTable } from "../../database";
+import {
+  attachmentsTable,
+  communitiesTable,
+  communityMembersTable,
+  usersTable,
+} from "../../database";
 import { eq } from "drizzle-orm";
 const router = express.Router();
 import profileRouter from "./profile";
@@ -16,6 +21,7 @@ import {
   EncryptPassword,
 } from "../../helpers/encryptions/password";
 import { createToken } from "../../email/verification/generateToken";
+import { deleteUserSchema } from "../../helpers/validations/user/delete";
 router.use(fileUpload({ safeFileNames: true }));
 
 router.get("/me", async (req, res) => {
@@ -187,6 +193,51 @@ router.post(
 
     res.status(200).json({ success: true });
     if (update.email) await createToken(update.email);
+  }
+);
+
+router.delete(
+  "/me",
+  requireAuth,
+  (req, res, next) =>
+    BodyValidationMiddleware(req, res, next, deleteUserSchema),
+  async (req, res) => {
+    const { password } = req.body;
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, req.user!.id));
+
+    if (!ComparePassword(password, user.password))
+      return res.status(401).json({
+        success: false,
+        message: "fail",
+        errors: {
+          password: ["Password is incorrect."],
+        },
+      });
+
+    await db
+      .update(usersTable)
+      .set({
+        displayName: "Deleted",
+        email: null,
+        emailVerified: false,
+        status: "deleted",
+        profilePicture: null,
+        banner: null,
+      })
+      .where(eq(usersTable.id, user.id));
+
+    await db
+      .delete(communityMembersTable)
+      .where(eq(communityMembersTable.userId, user.id));
+
+    await db
+      .delete(communitiesTable)
+      .where(eq(communitiesTable.creator, user.id));
+
+    return res.status(200).json({ success: true });
   }
 );
 

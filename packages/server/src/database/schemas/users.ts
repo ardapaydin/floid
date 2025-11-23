@@ -15,8 +15,11 @@ export const usersTable = mysqlTable("users", {
   profilePicture: varchar("profile_picture", { length: 255 }),
   banner: varchar("banner", { length: 255 }),
   displayName: varchar("display_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }),
   password: varchar("password", { length: 255 }).notNull(),
+  status: varchar("status", { length: 32 })
+    .$type<"deleted" | null>()
+    .default(null),
   emailVerified: boolean("email_verified").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
