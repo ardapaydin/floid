@@ -19,7 +19,7 @@ export function banMember(
   name: string,
   memberId: string,
   reason: string,
-  expiresAt: string
+  expiresAt: Date | null
 ) {
   return axios.post("/community/" + name + "/members/" + memberId + "/ban", {
     reason,

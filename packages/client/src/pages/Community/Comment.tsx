@@ -14,6 +14,7 @@ import { usePost } from "@/utils/api/post";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function Comment() {
@@ -84,7 +85,7 @@ function CommentInput() {
                 ]
             }))
         }
-        else setErrors(r.data?.errors)
+        else { setErrors(r.data?.errors); toast.error(r.data?.message) }
     }
 
     return (

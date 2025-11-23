@@ -15,6 +15,7 @@ import banRouter from "./ban";
 import RequirePermission from "../../../../helpers/middlewares/RequirePermission";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
+import BanCheck from "../../../../helpers/middlewares/BanCheck";
 const router = express.Router();
 router.use(roleRouter);
 router.use(banRouter);
@@ -110,6 +111,7 @@ router.get(
 router.post(
   "/:name/join",
   requireAuth,
+  BanCheck,
   CanAccessCommunity,
   async (req, res) => {
     const { name } = req.params;

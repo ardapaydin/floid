@@ -27,7 +27,7 @@ export function MemberContextMenu({ children, community, member }: { children: R
                                 e.preventDefault();
                             }}>
                             <Ban />
-                            Ban u/{member.username}
+                            Ban u/{member?.username}
                         </ContextMenuItem>
                     </BanMember>
                 )}

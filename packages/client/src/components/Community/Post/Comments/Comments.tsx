@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import CommentDropdownMenu from "@/components/Dropdown/Comment";
 import { UserAvatar } from "@/components/User/Avatar";
 import type { User } from "@/types/user";
+import toast from "react-hot-toast";
 
 export default function Comments({ comments, commentId, depth = 0 }: { comments: Post[], commentId?: string, depth?: number }) {
     const filter = (comments).filter(x => x.replyTo == commentId).sort((a, b) => b.votes - a.votes);
@@ -136,7 +137,7 @@ function ReplyInput({ setIsReplying, commentId }: { setIsReplying: React.Dispatc
                     ...old.replies,
                 ]
             }))
-        }
+        } else toast.error(r.data?.message)
     }
     return (
         <div className={`flex flex-col border-2 rounded-lg border-[#313131] cursor-text w-full`}>

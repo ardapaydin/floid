@@ -19,7 +19,7 @@ export const banTable = mysqlTable("bans", {
     { onDelete: "cascade" }
   ),
   reason: varchar("reason", { length: 255 }),
-  expiresAt: timestamp("expires_at"),
+  expiresAt: varchar("expires_at", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });

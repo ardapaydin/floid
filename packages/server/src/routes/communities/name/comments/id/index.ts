@@ -18,12 +18,14 @@ import hasPermission from "../../../../../helpers/permissions/hasPermission";
 import { voteImpact } from "../../../../../algorithm/calculate/voteImpact";
 import { COMMENT_DELETED_BY_MOD_WEIGHT } from "../../../../../algorithm/weights";
 import { commentImpact } from "../../../../../algorithm/calculate/commentImpact";
+import BanCheck from "../../../../../helpers/middlewares/BanCheck";
 const router = express.Router();
 
 router.post(
   "/:name/comments/:commentId/comment",
   requireAuth,
   CanAccessCommunity,
+  BanCheck,
   (req, res, next) =>
     BodyValidationMiddleware(req, res, next, createCommentSchema),
   async (req, res) => {

@@ -2,6 +2,7 @@ import express from "express";
 import { requireAuth } from "../../helpers/middlewares/Auth";
 import { db } from "../../database/db";
 import {
+  banTable,
   communitiesTable,
   communityMembersTable,
   invitesTable,
@@ -72,7 +73,7 @@ router.post("/:invite", requireAuth, async (req, res) => {
       .status(404)
       .json({ success: false, message: "Invite not found or expired." });
 
-  const [commnuity] = await db
+  const [community] = await db
     .select()
     .from(communitiesTable)
     .where(eq(communitiesTable.id, find.communityId));
@@ -82,7 +83,7 @@ router.post("/:invite", requireAuth, async (req, res) => {
     .from(communityMembersTable)
     .where(
       and(
-        eq(communityMembersTable.communityId, commnuity.id),
+        eq(communityMembersTable.communityId, community.id),
         eq(communityMembersTable.userId, req.user!.id)
       )
     );
@@ -92,13 +93,28 @@ router.post("/:invite", requireAuth, async (req, res) => {
       .status(400)
       .json({ success: false, message: "Already member of this community." });
 
-  if (commnuity.visibility == "public")
+  const [banned] = await db
+    .select()
+    .from(banTable)
+    .where(
+      and(
+        eq(banTable.userId, req.user!.id),
+        eq(banTable.communityId, community.id)
+      )
+    );
+  if (banned && (!banned.expiresAt || new Date() < new Date(banned.expiresAt)))
+    return res.status(403).json({
+      success: false,
+      message: "User is banned from this community.",
+    });
+
+  if (community.visibility == "public")
     return res
       .status(400)
       .json({ success: false, message: "This community is public" });
 
   await db.insert(communityMembersTable).values({
-    communityId: commnuity.id,
+    communityId: community.id,
     userId: req.user!.id,
   });
 

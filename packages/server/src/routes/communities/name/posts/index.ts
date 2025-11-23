@@ -18,6 +18,7 @@ import z from "zod";
 import idRouter from "./id";
 import { setCommentDetails } from "../../../../helpers/details/comment";
 import { calculate } from "../../../../algorithm/calculate/calculate";
+import BanCheck from "../../../../helpers/middlewares/BanCheck";
 const router = express.Router();
 router.use(idRouter);
 
@@ -152,6 +153,7 @@ router.post(
   "/:name/posts",
   requireAuth,
   CanAccessCommunity,
+  BanCheck,
   (req, res, next) =>
     BodyValidationMiddleware(req, res, next, createPostSchema),
   async (req, res) => {

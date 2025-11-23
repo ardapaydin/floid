@@ -4,6 +4,7 @@ import { useCommunityByName } from "@/utils/api/community";
 import { createCommunityPost, uploadAttachment } from "@/utils/api/post";
 import { Paperclip, Trash } from "lucide-react";
 import { useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function Submit() {
@@ -19,7 +20,7 @@ export default function Submit() {
     const post = async () => {
         const r = await createCommunityPost(name!, { ...form, attachments: form.attachments.map((a) => (a.id)) });
         if (r.status == 200) nav(`/c/${name!}/comments/${r.data.data.id}`)
-        else setErrors(r.data.errors)
+        else { setErrors(r.data?.errors || {}); toast.error(r.data?.message) }
     }
     const fileinput = useRef<HTMLInputElement>(null)
     const attachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +49,7 @@ export default function Submit() {
                 </div>
 
                 <div className="flex flex-col">
-                    {errors.title && <p className="text-red-400">{errors.title[0]}</p>}
+                    {errors.title && <p className="text-red-400">{errors?.title[0]}</p>}
                     <input
                         placeholder="Title"
                         maxLength={300}
