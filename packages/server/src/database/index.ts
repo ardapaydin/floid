@@ -7,3 +7,4 @@ export * from "./schemas/rules";
 export * from "./schemas/emailVerification";
 export * from "./schemas/invites";
 export * from "./schemas/loggedOut";
+export * from "./schemas/blockedUsers";

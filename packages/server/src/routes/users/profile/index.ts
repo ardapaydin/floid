@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../../../database/db";
 import user from "../../../helpers/db/selects/user";
 import {
+  blockedUsersTable,
   commentsTable,
   communitiesTable,
   communityMembersTable,
@@ -114,6 +115,33 @@ router.post("/:name/follow", requireAuth, async (req, res) => {
       .status(403)
       .json({ success: false, message: "cannot follow yourself" });
 
+  const [blocked] = await db
+    .select()
+    .from(blockedUsersTable)
+    .where(
+      and(
+        eq(blockedUsersTable.blockedBy, req.user!.id),
+        eq(blockedUsersTable.blockedUser, user.id)
+      )
+    );
+  if (blocked)
+    return res
+      .status(400)
+      .json({ success: false, message: "Cannot follow blocked users" });
+
+  const [blocked2] = await db
+    .select()
+    .from(blockedUsersTable)
+    .where(
+      and(
+        eq(blockedUsersTable.blockedUser, req.user!.id),
+        eq(blockedUsersTable.blockedBy, user.id)
+      )
+    );
+  if (blocked2)
+    return res
+      .status(400)
+      .json({ success: false, message: "Cannot follow this user" });
   const [following] = await db
     .select()
     .from(followersTable)

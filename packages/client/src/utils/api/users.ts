@@ -9,7 +9,7 @@ export function useUser() {
     queryKey: ["users", "me"],
     queryFn: async () => {
       const req = await axios.get("/users/me");
-      return req.data as { user?: User };
+      return req.data as { user?: User; blocked?: string[] };
     },
   });
 }
@@ -52,4 +52,12 @@ export function updateUser(data: Record<string, string>) {
 
 export function deleteUser(password: string) {
   return axios.delete("/users/me", { data: { password } });
+}
+
+export function blockUser(name: string) {
+  return axios.post("/users/" + name + "/block");
+}
+
+export function unblockUser(name: string) {
+  return axios.delete("/users/" + name + "/block");
 }

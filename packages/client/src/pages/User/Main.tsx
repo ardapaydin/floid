@@ -2,7 +2,7 @@ import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
 import { UserAvatar } from "@/components/User/Avatar";
 import type { User } from "@/types/user";
-import { followUser, unfollowUser, updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
+import { blockUser, followUser, unblockUser, unfollowUser, updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
 import dateToStr from "@/utils/date/dateToStr";
 import { useQueryClient } from "@tanstack/react-query";
 import { Image, Pencil } from "lucide-react";
@@ -63,6 +63,23 @@ export default function User() {
             }))
         }
     }
+    const blocked = user?.data?.blocked?.find((x) => x == profile.data?.id)
+    const triggerBlock = async () => {
+        if (!name) return
+        if (!blocked) {
+            const r = await blockUser(name)
+            if (r.status == 200) qc.setQueryData(["users", "me"], (old: { blocked: string[] }) => ({
+                ...old,
+                blocked: [...old.blocked, profile.data?.id]
+            }))
+        } else {
+            const r = await unblockUser(name);
+            if (r.status == 200) qc.setQueryData(["users", "me"], (old: { blocked: string[] }) => ({
+                ...old,
+                blocked: old.blocked.filter(x => x != profile.data?.id)
+            }))
+        }
+    }
 
     return (
         <Layout>
@@ -93,8 +110,6 @@ export default function User() {
                                 </div>
                             </div>
                         </div>
-
-
                         <MainSections />
                     </div>
 
@@ -112,11 +127,17 @@ export default function User() {
                             <div className="p-4 flex flex-col gap-4">
                                 <h1 className="text-gray-200 font-bold">{profile.data?.displayName}</h1>
                                 {profile.data?.id != user.data?.user?.id && (
-                                    <div className="flex">
+                                    <div className="flex items-center gap-1 justify-between" >
                                         <button
+                                            hidden={Boolean(blocked)}
                                             onClick={() => triggerFollow()}
                                             className="px-2 justify-center items-center text-xs flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-1 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
                                             {profile.data?.following ? "Unfollow" : "Follow"}
+                                        </button>
+                                        <button
+                                            onClick={() => triggerBlock()}
+                                            className="px-2 justify-center items-center text-xs flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-1 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition">
+                                            {blocked ? "Unblock" : "Block"}
                                         </button>
 
                                     </div>

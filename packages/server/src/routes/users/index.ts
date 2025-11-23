@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../../database/db";
 import {
   attachmentsTable,
+  blockedUsersTable,
   communitiesTable,
   communityMembersTable,
   usersTable,
@@ -9,6 +10,7 @@ import {
 import { eq } from "drizzle-orm";
 const router = express.Router();
 import profileRouter from "./profile";
+import blockRouter from "./block";
 import { requireAuth } from "../../helpers/middlewares/Auth";
 import FileValidationMiddleware from "../../helpers/middlewares/FileValidation";
 import fileUpload, { UploadedFile } from "express-fileupload";
@@ -42,7 +44,14 @@ router.get("/me", async (req, res) => {
     .from(usersTable)
     .where(eq(usersTable.id, req.user.id));
 
-  return res.status(200).json({ user });
+  const blocked = await db
+    .select()
+    .from(blockedUsersTable)
+    .where(eq(blockedUsersTable.blockedBy, req.user.id));
+
+  return res
+    .status(200)
+    .json({ user, blocked: blocked.map((block) => block.blockedUser) });
 });
 
 router.post(
@@ -242,5 +251,6 @@ router.delete(
 );
 
 router.use(profileRouter);
+router.use(blockRouter);
 
 export default router;

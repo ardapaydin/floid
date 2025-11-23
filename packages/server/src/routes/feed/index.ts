@@ -2,12 +2,23 @@ import express from "express";
 import z from "zod";
 import { db } from "../../database/db";
 import {
+  blockedUsersTable,
   commentsTable,
   communitiesTable,
   communityMembersTable,
   voteTable,
 } from "../../database";
-import { and, eq, inArray, sql, count, desc, or, isNotNull } from "drizzle-orm";
+import {
+  and,
+  eq,
+  inArray,
+  sql,
+  count,
+  desc,
+  or,
+  isNotNull,
+  isNull,
+} from "drizzle-orm";
 import post from "../../helpers/db/selects/post";
 import { setCommentDetails } from "../../helpers/details/comment";
 import { freshBoostByDate } from "../../algorithm/database/freshBoostByDate";
@@ -59,6 +70,13 @@ router.get(
           eq(voteTable.userId, req.user?.id || "")
         )
       )
+      .leftJoin(
+        blockedUsersTable,
+        and(
+          eq(blockedUsersTable.blockedBy, req.user?.id || ""),
+          eq(blockedUsersTable.blockedUser, commentsTable.createdBy)
+        )
+      )
       .where(
         and(
           eq(commentsTable.post, true),
@@ -70,7 +88,9 @@ router.get(
               eq(communitiesTable.visibility, "private"),
               isNotNull(communityMembersTable.userId)
             )
-          )
+          ),
+
+          isNull(blockedUsersTable.blockedUser)
         )
       )
       .groupBy(commentsTable.id)
@@ -166,6 +186,13 @@ router.get(
           eq(voteTable.userId, req.user?.id || "")
         )
       )
+      .leftJoin(
+        blockedUsersTable,
+        and(
+          eq(blockedUsersTable.blockedBy, req.user?.id || ""),
+          eq(blockedUsersTable.blockedUser, commentsTable.createdBy)
+        )
+      )
       .where(
         and(
           eq(commentsTable.post, true),
@@ -177,7 +204,9 @@ router.get(
               eq(communitiesTable.visibility, "private"),
               isNotNull(communityMembersTable.userId)
             )
-          )
+          ),
+
+          isNull(blockedUsersTable.blockedUser)
         )
       )
       .groupBy(commentsTable.id)

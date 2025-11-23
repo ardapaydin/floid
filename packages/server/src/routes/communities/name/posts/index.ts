@@ -5,11 +5,12 @@ import { createPostSchema } from "../../../../helpers/validations/communities/po
 import { db } from "../../../../database/db";
 import {
   attachmentsTable,
+  blockedUsersTable,
   commentsTable,
   communitiesTable,
   voteTable,
 } from "../../../../database";
-import { and, count, desc, eq, gte, inArray } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import post from "../../../../helpers/db/selects/post";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
@@ -58,12 +59,20 @@ router.get(
       posts = await db
         .select({ ...post, comments: count(commentsTable.relatedTo) })
         .from(commentsTable)
+        .leftJoin(
+          blockedUsersTable,
+          and(
+            eq(blockedUsersTable.blockedBy, req.user?.id || ""),
+            eq(blockedUsersTable.blockedUser, commentsTable.createdBy)
+          )
+        )
         .where(
           and(
             eq(commentsTable.communityId, findCommunity.id),
             eq(commentsTable.post, true),
             eq(commentsTable.deleted, false),
-            gte(commentsTable.createdAt, d)
+            gte(commentsTable.createdAt, d),
+            isNull(blockedUsersTable.blockedUser)
           )
         )
         .leftJoin(
@@ -83,11 +92,19 @@ router.get(
       posts = await db
         .select({ ...post, comments: count(commentsTable.relatedTo) })
         .from(commentsTable)
+        .leftJoin(
+          blockedUsersTable,
+          and(
+            eq(blockedUsersTable.blockedBy, req.user?.id || ""),
+            eq(blockedUsersTable.blockedUser, commentsTable.createdBy)
+          )
+        )
         .where(
           and(
             eq(commentsTable.communityId, findCommunity.id),
             eq(commentsTable.post, true),
-            eq(commentsTable.deleted, false)
+            eq(commentsTable.deleted, false),
+            isNull(blockedUsersTable.blockedUser)
           )
         )
         .leftJoin(
