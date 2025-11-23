@@ -9,6 +9,13 @@ import FileValidationMiddleware from "../../helpers/middlewares/FileValidation";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import S3 from "../../cdn";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import BodyValidationMiddleware from "../../helpers/middlewares/BodyValidation";
+import { updateUserSchema } from "../../helpers/validations/user/update";
+import {
+  ComparePassword,
+  EncryptPassword,
+} from "../../helpers/encryptions/password";
+import { createToken } from "../../email/verification/generateToken";
 router.use(fileUpload({ safeFileNames: true }));
 
 router.get("/me", async (req, res) => {
@@ -120,6 +127,83 @@ router.post(
     return res
       .status(200)
       .json({ success: true, key: key.replace("banner/", "") });
+  }
+);
+
+router.post(
+  "/me",
+  requireAuth,
+  (req, res, next) =>
+    BodyValidationMiddleware(req, res, next, updateUserSchema),
+  async (req, res) => {
+    const { email, password, newPassword, username, displayName } = req.body;
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, req.user!.id));
+    let update: Record<string, any> = {};
+    if (email) {
+      if (!ComparePassword(password, user.password))
+        return res.status(401).json({
+          success: false,
+          message: "fail",
+          errors: {
+            password: ["Password is incorrect."],
+          },
+        });
+
+      const [findemail] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email));
+      if (findemail)
+        return res.status(400).json({
+          success: false,
+          message: "email already registered.",
+          errors: {
+            email: ["Email already registered."],
+          },
+        });
+      update.email = email;
+      update.emailVerified = false;
+    }
+
+    if (password && newPassword) {
+      if (!ComparePassword(password, user.password))
+        return res.status(401).json({
+          success: false,
+          message: "fail",
+          errors: {
+            password: ["Password is incorrect."],
+          },
+        });
+
+      update.password = EncryptPassword(newPassword);
+    }
+
+    if (username) {
+      const [findname] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.username, username));
+      if (findname)
+        return res.status(400).json({
+          success: false,
+          message: "Username exists",
+          errors: {
+            username: ["Username already exists"],
+          },
+        });
+
+      update.username = username;
+    }
+
+    if (displayName) update.displayName;
+
+    await db.update(usersTable).set(update).where(eq(usersTable.id, user.id));
+
+    res.status(200).json({ success: true });
+    if (update.email) await createToken(update.email);
   }
 );
 

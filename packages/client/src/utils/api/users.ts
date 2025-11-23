@@ -45,3 +45,7 @@ export function followUser(name: string) {
 export function unfollowUser(name: string) {
   return axios.delete("/users/" + name + "/follow");
 }
+
+export function updateUser(data: Record<string, string>) {
+  return axios.post("/users/me", data);
+}

@@ -10,6 +10,7 @@ import User from "./pages/User/Main";
 import Loading from "./components/Loading/Loading";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import { Invite } from "./pages/Main/Invite";
+import AccountSettings from "./pages/Settings/Account";
 
 function App() {
   const user = useUser()
@@ -23,6 +24,7 @@ function App() {
       <Route path="/u/:name" element={<User />} />
       <Route path="/invite/:id" element={<Invite />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/settings/account" element={<AccountSettings />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>

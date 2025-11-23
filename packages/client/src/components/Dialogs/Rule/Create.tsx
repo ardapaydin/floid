@@ -33,7 +33,7 @@ export default function CreateRule({ children }: { children: React.ReactNode }) 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1">
                         <label className="font-bold">Title</label>
-                        {errors.name && <p className="text-red-400">{errors.name[0]}</p>}
+                        {errors.title && <p className="text-red-400">{errors.title[0]}</p>}
                         <div className="flex focus-within:ring-2 rounded-lg focus-within:ring-orange-400/50 transition">
                             <input
                                 value={form.title}
@@ -49,7 +49,7 @@ export default function CreateRule({ children }: { children: React.ReactNode }) 
                     </div>
                     <div className="flex flex-col gap-1">
                         <label className="font-bold">Description</label>
-                        {errors.name && <p className="text-red-400">{errors.name[0]}</p>}
+                        {errors.description && <p className="text-red-400">{errors.description[0]}</p>}
                         <div className="flex focus-within:ring-2 rounded-lg focus-within:ring-orange-400/50 transition">
                             <textarea
                                 value={form.content}
