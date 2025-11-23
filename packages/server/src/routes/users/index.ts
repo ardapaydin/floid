@@ -136,7 +136,7 @@ router.post(
   (req, res, next) =>
     BodyValidationMiddleware(req, res, next, updateUserSchema),
   async (req, res) => {
-    const { email, password, newPassword, username, displayName } = req.body;
+    const { email, password, newPassword, displayName } = req.body;
     const [user] = await db
       .select()
       .from(usersTable)
@@ -180,27 +180,10 @@ router.post(
 
       update.password = EncryptPassword(newPassword);
     }
+    if (displayName) update.displayName = displayName;
 
-    if (username) {
-      const [findname] = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.username, username));
-      if (findname)
-        return res.status(400).json({
-          success: false,
-          message: "Username exists",
-          errors: {
-            username: ["Username already exists"],
-          },
-        });
-
-      update.username = username;
-    }
-
-    if (displayName) update.displayName;
-
-    await db.update(usersTable).set(update).where(eq(usersTable.id, user.id));
+    if (Object.keys(update).length)
+      await db.update(usersTable).set(update).where(eq(usersTable.id, user.id));
 
     res.status(200).json({ success: true });
     if (update.email) await createToken(update.email);

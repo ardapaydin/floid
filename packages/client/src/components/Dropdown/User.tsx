@@ -3,6 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dr
 import { UserAvatar } from "../User/Avatar";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Settings } from "lucide-react";
 
 export default function UserDropdownMenu({ children }: { children: React.ReactNode }) {
     const user = useUser();
@@ -22,6 +23,17 @@ export default function UserDropdownMenu({ children }: { children: React.ReactNo
                         <div className="flex flex-col">
                             <p className="text-sm text-white">View Profile</p>
                             <p className="text-white/50 text-xs">u/{user.data.user.username}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-sm cursor-pointer hover:bg-[#333]/50 transition-all px-4 py-4 rounded-lg" onClick={() => {
+                        nav("/settings/account")
+                        setIsOpen(false)
+                    }}>
+                        <Settings className="text-white" />
+                        <div className="flex flex-col">
+                            <p className="text-sm text-white">Settings</p>
                         </div>
                     </div>
                 </div>

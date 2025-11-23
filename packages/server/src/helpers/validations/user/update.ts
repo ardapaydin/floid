@@ -3,7 +3,6 @@ import z from "zod";
 export const updateUserSchema = z.object({
   email: z.email().optional(),
   displayName: z.string().max(32).trim().min(1).optional(),
-  username: z.string().max(32).trim().min(1).toLowerCase().optional(),
   password: z
     .string()
     .regex(

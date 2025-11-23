@@ -14,7 +14,13 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                         Account
                     </div>
                 </div>
-
+                <div className="flex gap-2">
+                    <div
+                        onClick={() => nav("/settings/profile")}
+                        className={cn("hover:bg-[#444]/70 transition-all text-gray-200 font-semibold px-5 py-2 cursor-pointer rounded-full border-[#444]", window.location.href.endsWith("/profile") ? "bg-[#444]/50" : "border")}>
+                        Profile
+                    </div>
+                </div>
             </div>
 
             {children}
