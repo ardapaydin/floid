@@ -7,6 +7,7 @@ import UpdatePassword from "@/components/Dialogs/Settings/UpdatePassword";
 import { DeleteAccount } from "@/components/Dialogs/Settings/DeleteAccount";
 import BlockedUsers from "@/components/Dialogs/Settings/BlockedUsers";
 import { TwoFactorAuthentication } from "@/components/Dialogs/Settings/TwoFactorAuthentication";
+import { cn } from "@/lib/utils";
 
 export default function AccountSettings() {
     const user = useUser();
@@ -55,16 +56,25 @@ export default function AccountSettings() {
                     <h2 className="text-lg font-semibold mt-4">Advanced</h2>
 
                     <TwoFactorAuthentication>
-                        <div className="w-full group text-sm cursor-pointer py-2 text-white/90 justify-between flex">
+                        <div className={cn("w-full group text-sm cursor-pointer py-2 text-white/90 justify-between flex", user.data?.twoFactor && "hidden")}>
                             <span>Two Factor Authentication</span>
                             <div className="flex gap-2 text-xs items-center">
-                                <div className="w-2 h-2 bg-red-400 rounded-full" />
+                                <div className={cn("w-2 h-2 bg-red-400 rounded-full", user?.data?.twoFactor && "bg-green-400")} />
                                 <div className="group-hover:bg-[#333] rounded-full p-0.5 px-1.5 transition-all duration-300">
                                     <ChevronRightIcon className="w-4" />
                                 </div>
                             </div>
                         </div>
                     </TwoFactorAuthentication>
+                    <div className={cn("w-full group text-sm cursor-pointer py-2 text-white/90 justify-between flex", !user.data?.twoFactor && "hidden")}>
+                        <span>Two Factor Authentication</span>
+                        <div className="flex gap-2 text-xs items-center">
+                            <div className={cn("w-2 h-2 bg-red-400 rounded-full", user?.data?.twoFactor && "bg-green-400")} />
+                            <div className="group-hover:bg-[#333] rounded-full p-0.5 px-1.5 transition-all duration-300">
+                                <ChevronRightIcon className="w-4" />
+                            </div>
+                        </div>
+                    </div>
 
 
                     <DeleteAccount>

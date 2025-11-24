@@ -1,12 +1,17 @@
 import express from "express";
 import { requireAuth } from "../../../helpers/middlewares/Auth";
 import { db } from "../../../database/db";
-import { twoFactorAuthenticatonTable, usersTable } from "../../../database";
+import {
+  backupCodesTable,
+  twoFactorAuthenticatonTable,
+  usersTable,
+} from "../../../database";
 import { and, eq } from "drizzle-orm";
 import speakeasy from "speakeasy";
-import qrcode, { toDataURL } from "qrcode";
+import { toDataURL } from "qrcode";
 import BodyValidationMiddleware from "../../../helpers/middlewares/BodyValidation";
 import z from "zod";
+import { createBackupCodes } from "../../../helpers/utils/createBackupCodes";
 const router = express.Router();
 
 router.post("/me/2fa/setup", requireAuth, async (req, res) => {
@@ -51,7 +56,7 @@ router.post("/me/2fa/setup", requireAuth, async (req, res) => {
 });
 
 router.post(
-  "/me/2fa/enable",
+  "/me/2fa/verify",
   requireAuth,
   (req, res, next) =>
     BodyValidationMiddleware(
@@ -111,7 +116,15 @@ router.post(
       })
       .where(eq(twoFactorAuthenticatonTable.id, twoFa.id));
 
-    return res.status(200).json({ success: true });
+    const backupcodes = createBackupCodes();
+    for (const backupcode of backupcodes)
+      await db.insert(backupCodesTable).values({
+        userId: req.user!.id,
+        twoFaId: twoFa.id,
+        key: backupcode,
+      });
+
+    return res.status(200).json({ success: true, codes: backupcodes });
   }
 );
 

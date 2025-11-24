@@ -13,3 +13,4 @@ export * from "./schemas/resetPassword";
 export * from "./schemas/bookmarks";
 export * from "./schemas/flairs";
 export * from "./schemas/twoFactorAuthenticaton";
+export * from "./schemas/backupCodes";

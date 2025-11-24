@@ -9,7 +9,11 @@ export function useUser() {
     queryKey: ["users", "me"],
     queryFn: async () => {
       const req = await axios.get("/users/me");
-      return req.data as { user?: User; blocked?: string[] };
+      return req.data as {
+        user?: User;
+        blocked?: string[];
+        twoFactor?: boolean;
+      };
     },
   });
 }

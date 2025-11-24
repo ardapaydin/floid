@@ -7,6 +7,7 @@ import {
   commentsTable,
   communitiesTable,
   communityMembersTable,
+  twoFactorAuthenticatonTable,
   usersTable,
   voteTable,
 } from "../../database";
@@ -66,9 +67,23 @@ router.get("/me", async (req, res) => {
     .from(blockedUsersTable)
     .where(eq(blockedUsersTable.blockedBy, req.user.id));
 
+  const [twoFactor] = await db
+    .select()
+    .from(twoFactorAuthenticatonTable)
+    .where(
+      and(
+        eq(twoFactorAuthenticatonTable.userId, req.user!.id),
+        eq(twoFactorAuthenticatonTable.verified, true)
+      )
+    );
+
   return res
     .status(200)
-    .json({ user, blocked: blocked.map((block) => block.blockedUser) });
+    .json({
+      user,
+      blocked: blocked.map((block) => block.blockedUser),
+      twoFactor: Boolean(twoFactor),
+    });
 });
 
 router.post(

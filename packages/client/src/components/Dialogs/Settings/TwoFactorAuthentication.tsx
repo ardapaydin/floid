@@ -1,6 +1,8 @@
 import Loading from "@/components/Loading/Loading";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useTwoFactor } from "@/utils/api/twoFa";
+import { useTwoFactor, verifyTwoFactor } from "@/utils/api/twoFa";
+import { useUser } from "@/utils/api/users";
+import { useQueryClient } from "@tanstack/react-query";
 import { Copy } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -10,14 +12,37 @@ export function TwoFactorAuthentication({ children }: { children: React.ReactNod
     const [code, setCode] = useState("")
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const twoFa = useTwoFactor(isOpen);
+    const user = useUser();
+    const [backupCodes, setBackupCodes] = useState<string[]>([])
+    const qc = useQueryClient();
+    const verify = async () => {
+        const r = await verifyTwoFactor(code);
+        if (r.status == 200) {
+            setBackupCodes(r.data.codes);
+            qc.setQueryData(["users", "me"], (old: { twoFactor: boolean }) => ({ ...old, twoFactor: true }))
+        }
+        else setErrors(r.data?.errors)
+    }
+
+    const downloadcodes = () => {
+        const codes = backupCodes.join("\n");
+        const blob = new Blob([codes], { type: "text/plain" });
+        const u = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = u;
+        a.download = `${user.data?.user?.username}_backup_codes.txt`;
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(u);
+    }
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
-                <DialogTitle>Enable Two Factor Authentication</DialogTitle>
                 {twoFa.isLoading && <Loading />}
-                {twoFa.data && (
+                {(twoFa.data && !backupCodes.length) && (
                     <div className="flex flex-col gap-4 w-full">
+                        <DialogTitle>Enable Two Factor Authentication</DialogTitle>
                         <div className="items-center flex justify-center">
                             <img src={twoFa.data.data.qrUrl} className="w-52 h-52 rounded-2xl bg-white p-4" />
                         </div>
@@ -62,12 +87,35 @@ export function TwoFactorAuthentication({ children }: { children: React.ReactNod
 
                         <div className="flex justify-end border-t border-[#444]">
                             <button
+                                onClick={() => verify()}
                                 disabled={code.length != 6}
                                 className="mt-4 px-4 justify-center items-center flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition"
                             >
                                 Verify
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {Boolean(backupCodes.length) && (
+                    <div className="flex flex-col gap-4">
+                        <DialogTitle className="font-medium">Backup Codes</DialogTitle>
+                        <div className="grid md:grid-cols-2 gap-2">
+                            {backupCodes.map((c, i) => (
+                                <div key={"code-" + i} className="bg-[#313131] p-2 rounded-lg text-center select-text">
+                                    {c}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-end border-t border-[#444]">
+                            <button
+                                onClick={() => downloadcodes()}
+                                className="mt-4 px-4 justify-center items-center flex disabled:opacity-50 disabled:hover:bg-orange-500 disabled:hover:translate-y-0 disabled:cursor-not-allowed py-2 rounded-lg bg-orange-500 border-b-6 border-gray-400/50 hover:translate-y-0.5 hover:bg-orange-600 text-white cursor-pointer font-semibold transition"
+                            >
+                                Download
+                            </button>
+                        </div>
+
                     </div>
                 )}
             </DialogContent>

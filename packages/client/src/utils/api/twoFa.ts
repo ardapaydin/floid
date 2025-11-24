@@ -17,3 +17,7 @@ export function useTwoFactor(enabled: boolean) {
     enabled,
   });
 }
+
+export function verifyTwoFactor(code: string) {
+  return axios.post("/users/me/2fa/verify", { code });
+}
