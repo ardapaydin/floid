@@ -1,4 +1,4 @@
-import { Home, Lock, Plus } from "lucide-react";
+import { Bookmark, Home, Lock, Plus } from "lucide-react";
 import CreateCommunity from "../Dialogs/Community/Create";
 import { useCommunities } from "@/utils/api/community";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,12 @@ export function Sidebar() {
                     className="hover:bg-[#333]/20 transition cursor-pointer w-full flex py-3 xl:px-4 rounded-lg gap-2 text-sm items-center">
                     <Home className="w-8" />
                     Home
+                </div>
+                <div
+                    onClick={() => nav("/bookmarks")}
+                    className="hover:bg-[#333]/20 transition cursor-pointer w-full flex py-3 xl:px-4 rounded-lg gap-2 text-sm items-center">
+                    <Bookmark className="w-8" />
+                    Bookmarks
                 </div>
                 {(Array.isArray(recent) && Boolean(recent.length)) && (
                     <>

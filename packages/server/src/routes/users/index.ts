@@ -3,11 +3,14 @@ import { db } from "../../database/db";
 import {
   attachmentsTable,
   blockedUsersTable,
+  bookmarksTable,
+  commentsTable,
   communitiesTable,
   communityMembersTable,
   usersTable,
+  voteTable,
 } from "../../database";
-import { eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, or } from "drizzle-orm";
 const router = express.Router();
 import profileRouter from "./profile";
 import blockRouter from "./block";
@@ -24,6 +27,10 @@ import {
 } from "../../helpers/encryptions/password";
 import { createToken } from "../../email/verification/generateToken";
 import { deleteUserSchema } from "../../helpers/validations/user/delete";
+import post from "../../helpers/db/selects/post";
+import QueryValidationMiddleware from "../../helpers/middlewares/QueryValidation";
+import z from "zod";
+import { setCommentDetails } from "../../helpers/details/comment";
 router.use(fileUpload({ safeFileNames: true }));
 
 router.get("/me", async (req, res) => {
@@ -247,6 +254,134 @@ router.delete(
       .where(eq(communitiesTable.creator, user.id));
 
     return res.status(200).json({ success: true });
+  }
+);
+
+router.get(
+  "/me/saved",
+  requireAuth,
+  (req, res, next) =>
+    QueryValidationMiddleware(
+      req,
+      res,
+      next,
+      z.object({
+        offset: z
+          .string()
+          .transform((v) => parseInt(v))
+          .optional(),
+      })
+    ),
+  async (req, res) => {
+    let { offset } = req.query;
+    if (!offset) offset = "0";
+    const saved = await db
+      .select()
+      .from(bookmarksTable)
+      .where(eq(bookmarksTable.userId, req.user!.id));
+
+    const posts = await db
+      .select({ ...post, comments: count(commentsTable.relatedTo) })
+      .from(commentsTable)
+      .leftJoin(
+        communityMembersTable,
+        and(
+          eq(communityMembersTable.communityId, commentsTable.communityId),
+          eq(communityMembersTable.userId, req.user!.id)
+        )
+      )
+      .leftJoin(
+        communitiesTable,
+        eq(communitiesTable.id, commentsTable.communityId)
+      )
+      .leftJoin(
+        voteTable,
+        and(
+          eq(voteTable.commentId, commentsTable.id),
+          eq(voteTable.userId, req.user!.id)
+        )
+      )
+      .leftJoin(
+        bookmarksTable,
+        and(
+          eq(bookmarksTable.postId, commentsTable.id),
+          eq(bookmarksTable.userId, req.user!.id)
+        )
+      )
+      .where(
+        and(
+          eq(commentsTable.post, true),
+          eq(commentsTable.deleted, false),
+          or(
+            eq(communitiesTable.visibility, "public"),
+            and(
+              eq(communitiesTable.visibility, "private"),
+              isNotNull(communityMembersTable.userId)
+            )
+          ),
+          inArray(
+            commentsTable.id,
+            saved.map((s) => s.postId)
+          )
+        )
+      )
+      .orderBy(desc(bookmarksTable.createdAt))
+      .groupBy(commentsTable.id)
+      .limit(10)
+      .offset(parseInt(offset as string));
+
+    for (const comment of posts) {
+      await setCommentDetails(comment);
+      const [community] = await db
+        .select()
+        .from(communitiesTable)
+        .where(eq(communitiesTable.id, comment.communityId!));
+      (comment as any).community = community;
+    }
+
+    const [{ count: total }] = await db
+      .select({ count: count() })
+      .from(commentsTable)
+      .leftJoin(
+        communityMembersTable,
+        and(
+          eq(communityMembersTable.communityId, commentsTable.communityId),
+          eq(communityMembersTable.userId, req.user!.id)
+        )
+      )
+      .leftJoin(
+        communitiesTable,
+        eq(communitiesTable.id, commentsTable.communityId)
+      )
+      .where(
+        and(
+          eq(commentsTable.post, true),
+          eq(commentsTable.deleted, false),
+          or(
+            eq(communitiesTable.visibility, "public"),
+            and(
+              eq(communitiesTable.visibility, "private"),
+              isNotNull(communityMembersTable.userId)
+            )
+          ),
+          inArray(
+            commentsTable.id,
+            saved.map((s) => s.postId)
+          )
+        )
+      );
+
+    return res.status(200).json({
+      posts: posts,
+      pagination: {
+        totalComments: total,
+        currentPage: Math.floor(Number(offset) / 10) + 1,
+        totalPages: Math.ceil(total / 10),
+        itemsPerPage: 10,
+        hasNextPage: Number(offset) + 10 < total,
+        hasPreviousPage: Number(offset) > 0,
+      },
+    });
   }
 );
 
