@@ -6,12 +6,14 @@ import user from "../../../../helpers/db/selects/user";
 import {
   communitiesTable,
   communityMembersTable,
+  flairTable,
   usersTable,
 } from "../../../../database";
 import { and, eq, inArray, like, or } from "drizzle-orm";
 import { requireAuth } from "../../../../helpers/middlewares/Auth";
 import roleRouter from "./role";
 import banRouter from "./ban";
+import flairRouter from "./flair";
 import RequirePermission from "../../../../helpers/middlewares/RequirePermission";
 import QueryValidationMiddleware from "../../../../helpers/middlewares/QueryValidation";
 import CanAccessCommunity from "../../../../helpers/middlewares/CanAccessCommunity";
@@ -19,6 +21,7 @@ import BanCheck from "../../../../helpers/middlewares/BanCheck";
 const router = express.Router();
 router.use(roleRouter);
 router.use(banRouter);
+router.use(flairRouter);
 router.post(
   "/:name/members/details",
   (req, res, next) =>
@@ -36,7 +39,12 @@ router.post(
       .from(communitiesTable)
       .where(eq(communitiesTable.name, name));
     const users = await db
-      .select({ ...user, joinedAt: communityMembersTable.joinedAt })
+      .select({
+        ...user,
+        joinedAt: communityMembersTable.joinedAt,
+        role: communityMembersTable.role,
+        flair: flairTable,
+      })
       .from(usersTable)
       .leftJoin(
         communityMembersTable,
@@ -45,8 +53,23 @@ router.post(
           eq(communityMembersTable.communityId, community.id)
         )
       )
+      .leftJoin(
+        flairTable,
+        and(
+          eq(flairTable.id, communityMembersTable.flair),
+          eq(flairTable.communityId, community.id)
+        )
+      )
       .where(inArray(usersTable.id, userIds))
       .groupBy(usersTable.id);
+
+    for (const user of users)
+      if (
+        !user.role?.includes("mod") &&
+        !user.role?.includes("owner") &&
+        user.flair?.modOnly
+      )
+        user.flair = null;
 
     return res.status(200).json({ users });
   }
@@ -107,6 +130,47 @@ router.get(
     return res.status(200).json(users);
   }
 );
+
+router.get("/:name/members/me", requireAuth, async (req, res) => {
+  const { name } = req.params;
+  const [community] = await db
+    .select()
+    .from(communitiesTable)
+    .where(eq(communitiesTable.name, name));
+  const [userD] = await db
+    .select({
+      ...user,
+      joinedAt: communityMembersTable.joinedAt,
+      role: communityMembersTable.role,
+      flair: flairTable,
+    })
+    .from(usersTable)
+    .leftJoin(
+      communityMembersTable,
+      and(
+        eq(communityMembersTable.userId, usersTable.id),
+        eq(communityMembersTable.communityId, community.id)
+      )
+    )
+    .leftJoin(
+      flairTable,
+      and(
+        eq(flairTable.id, communityMembersTable.flair),
+        eq(flairTable.communityId, community.id)
+      )
+    )
+    .where(eq(usersTable.id, req.user!.id))
+    .groupBy(usersTable.id);
+
+  if (
+    !userD.role?.includes("mod") &&
+    !userD.role?.includes("owner") &&
+    userD.flair?.modOnly
+  )
+    userD.flair = null;
+
+  return res.status(200).json(userD);
+});
 
 router.post(
   "/:name/join",

@@ -1,9 +1,13 @@
+import type { Flair } from "@/types/flair";
 import type { User } from "@/types/user";
 import { getMembersDetails } from "@/utils/api/community";
 import { makeAutoObservable, runInAction } from "mobx";
 
 class UserStore {
-  communityUsers = new Map<string, Map<string, User & { loading?: boolean }>>();
+  communityUsers = new Map<
+    string,
+    Map<string, User & { loading?: boolean; flair: Flair }>
+  >();
 
   constructor() {
     makeAutoObservable(this);
@@ -32,7 +36,7 @@ class UserStore {
     for (const batch of batches) {
       const bulk = await getMembersDetails(communityName, batch);
       runInAction(() => {
-        bulk.data.users.forEach((user: User) => {
+        bulk.data.users.forEach((user: User & { flair: Flair }) => {
           this.setUser(communityName, user);
         });
       });
@@ -40,7 +44,7 @@ class UserStore {
     return filter;
   }
 
-  setUser(communityName: string, user: User) {
+  setUser(communityName: string, user: User & { flair: Flair }) {
     if (!this.communityUsers.has(communityName)) {
       this.communityUsers.set(communityName, new Map());
     }
@@ -57,7 +61,10 @@ class UserStore {
     const existingUser = users.get(userId);
     if (existingUser) users.set(userId, { ...existingUser, loading });
     else
-      users.set(userId, { id: userId, loading } as User & { loading: boolean });
+      users.set(userId, { id: userId, loading } as User & {
+        loading: boolean;
+        flair: Flair;
+      });
   }
 
   removeUserFromCommunity(communityName: string, userId: string) {
