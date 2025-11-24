@@ -8,24 +8,17 @@ import {
   communityMembersTable,
   voteTable,
 } from "../../database";
-import {
-  and,
-  eq,
-  inArray,
-  sql,
-  count,
-  desc,
-  or,
-  isNotNull,
-  isNull,
-} from "drizzle-orm";
+import { and, eq, sql, count, desc, or, isNotNull, isNull } from "drizzle-orm";
 import post from "../../helpers/db/selects/post";
 import { setCommentDetails } from "../../helpers/details/comment";
 import { freshBoostByDate } from "../../algorithm/database/freshBoostByDate";
 import { memberBoost } from "../../algorithm/feed/memberBoost";
 import QueryValidationMiddleware from "../../helpers/middlewares/QueryValidation";
 import { selfPenalty } from "../../algorithm/feed/selfPenalty";
+import searchRouter from "./search";
 const router = express.Router();
+
+router.use(searchRouter);
 
 router.get(
   "/best",

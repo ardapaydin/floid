@@ -59,7 +59,7 @@ export default function Main() {
     )
 }
 
-function Post({ post }: { post: (Post & { community: Community }) }) {
+export function Post({ post }: { post: (Post & { community: Community }) }) {
     const nav = useNavigate();
     if (!post.community) return
     return (
