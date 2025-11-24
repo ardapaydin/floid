@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { User } from "../../types/user";
 import type { Post } from "@/types/post";
@@ -70,5 +70,28 @@ export function useBlockedUsers(enabled: boolean) {
       return r.data as User[];
     },
     enabled,
+  });
+}
+
+export function useBookmarks(query: string) {
+  return useInfiniteQuery({
+    queryKey: ["users", "me", "bookmarks", query],
+    queryFn: async ({ pageParam }) => {
+      const d = await axios.get(
+        "/users/me/saved?query=" + query + "&offset=" + pageParam
+      );
+      return d.data as {
+        posts: Post[];
+        pagination: {
+          hasNextPage: boolean;
+          currentPage: number;
+        };
+      };
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination?.hasNextPage
+        ? lastPage.pagination?.currentPage * 10
+        : undefined,
   });
 }

@@ -14,6 +14,7 @@ import {
 } from "drizzle-orm";
 import {
   blockedUsersTable,
+  bookmarksTable,
   commentsTable,
   communitiesTable,
   communityMembersTable,
@@ -70,6 +71,13 @@ router.get(
         and(
           eq(voteTable.commentId, commentsTable.id),
           eq(voteTable.userId, req.user?.id || "")
+        )
+      )
+      .leftJoin(
+        bookmarksTable,
+        and(
+          eq(bookmarksTable.userId, req.user?.id || ""),
+          eq(bookmarksTable.postId, commentsTable.id)
         )
       )
       .leftJoin(

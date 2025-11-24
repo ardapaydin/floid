@@ -11,6 +11,7 @@ export interface Post {
   deleted: boolean;
   vote: ("up" | "down") | null;
   votes: number;
+  saved: boolean;
   comments: number;
   createdAt: string;
   updatedAt: string;

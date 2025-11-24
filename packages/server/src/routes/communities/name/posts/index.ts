@@ -6,6 +6,7 @@ import { db } from "../../../../database/db";
 import {
   attachmentsTable,
   blockedUsersTable,
+  bookmarksTable,
   commentsTable,
   communitiesTable,
   voteTable,
@@ -77,6 +78,13 @@ router.get(
           )
         )
         .leftJoin(
+          bookmarksTable,
+          and(
+            eq(bookmarksTable.userId, req.user?.id || ""),
+            eq(bookmarksTable.postId, commentsTable.id)
+          )
+        )
+        .leftJoin(
           voteTable,
           and(
             eq(voteTable.commentId, commentsTable.id),
@@ -106,6 +114,13 @@ router.get(
             eq(commentsTable.post, true),
             eq(commentsTable.deleted, false),
             isNull(blockedUsersTable.blockedUser)
+          )
+        )
+        .leftJoin(
+          bookmarksTable,
+          and(
+            eq(bookmarksTable.userId, req.user?.id || ""),
+            eq(bookmarksTable.postId, commentsTable.id)
           )
         )
         .leftJoin(

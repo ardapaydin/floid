@@ -10,7 +10,16 @@ import {
   usersTable,
   voteTable,
 } from "../../database";
-import { and, count, desc, eq, inArray, isNotNull, or } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  like,
+  or,
+} from "drizzle-orm";
 const router = express.Router();
 import profileRouter from "./profile";
 import blockRouter from "./block";
@@ -270,10 +279,11 @@ router.get(
           .string()
           .transform((v) => parseInt(v))
           .optional(),
+        query: z.string().optional(),
       })
     ),
   async (req, res) => {
-    let { offset } = req.query;
+    let { offset, query } = req.query;
     if (!offset) offset = "0";
     const saved = await db
       .select()
@@ -322,7 +332,13 @@ router.get(
           inArray(
             commentsTable.id,
             saved.map((s) => s.postId)
-          )
+          ),
+          query
+            ? or(
+                like(commentsTable.title, `%${query}%`),
+                like(commentsTable.content, `%${query}%`)
+              )
+            : undefined
         )
       )
       .orderBy(desc(bookmarksTable.createdAt))
@@ -367,7 +383,13 @@ router.get(
           inArray(
             commentsTable.id,
             saved.map((s) => s.postId)
-          )
+          ),
+          query
+            ? or(
+                like(commentsTable.title, `%${query}%`),
+                like(commentsTable.content, `%${query}%`)
+              )
+            : undefined
         )
       );
 

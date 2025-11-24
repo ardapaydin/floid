@@ -1,4 +1,5 @@
-import { commentsTable, voteTable } from "../../../database";
+import { isNotNull } from "drizzle-orm";
+import { commentsTable, voteTable, bookmarksTable } from "../../../database";
 
 export default {
   id: commentsTable.id,
@@ -12,6 +13,7 @@ export default {
   relatedTo: commentsTable.relatedTo,
   deleted: commentsTable.deleted,
   vote: voteTable.type,
+  saved: isNotNull(bookmarksTable.id),
   createdAt: commentsTable.createdAt,
   updatedAt: commentsTable.updatedAt,
 };

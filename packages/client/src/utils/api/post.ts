@@ -62,3 +62,11 @@ export function votePost(
 export function uploadAttachment(name: string, formdata: FormData) {
   return axios.post("/community/" + name + "/attachments", formdata);
 }
+
+export function savePost(name: string, postId: string) {
+  return axios.post("/community/" + name + "/posts/" + postId + "/save");
+}
+
+export function unsavePost(name: string, postId: string) {
+  return axios.delete("/community/" + name + "/posts/" + postId + "/save");
+}

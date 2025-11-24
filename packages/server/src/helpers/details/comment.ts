@@ -18,5 +18,6 @@ export async function setCommentDetails(comment: any) {
     allvotes.filter((x) => x.type == "up").length -
     allvotes.filter((x) => x.type == "down").length;
   comment.votes = total;
+  if ("saved" in comment) comment.saved = Boolean(comment.saved);
   return comment;
 }

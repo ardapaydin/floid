@@ -10,6 +10,7 @@ import { and, count, eq } from "drizzle-orm";
 import post from "../../../../../helpers/db/selects/post";
 import CanAccessCommunity from "../../../../../helpers/middlewares/CanAccessCommunity";
 import { requireAuth } from "../../../../../helpers/middlewares/Auth";
+import { setCommentDetails } from "../../../../../helpers/details/comment";
 const router = express.Router();
 
 router.get("/:name/posts/:postId", CanAccessCommunity, async (req, res) => {
@@ -27,6 +28,13 @@ router.get("/:name/posts/:postId", CanAccessCommunity, async (req, res) => {
       and(
         eq(voteTable.commentId, commentsTable.id),
         eq(voteTable.userId, req.user?.id || "")
+      )
+    )
+    .leftJoin(
+      bookmarksTable,
+      and(
+        eq(bookmarksTable.userId, req.user?.id || ""),
+        eq(bookmarksTable.postId, commentsTable.id)
       )
     )
     .where(
@@ -48,42 +56,18 @@ router.get("/:name/posts/:postId", CanAccessCommunity, async (req, res) => {
         eq(voteTable.userId, req.user?.id || "")
       )
     )
+    .leftJoin(
+      bookmarksTable,
+      and(
+        eq(bookmarksTable.userId, req.user?.id || ""),
+        eq(bookmarksTable.postId, commentsTable.id)
+      )
+    )
     .where(
       and(eq(commentsTable.relatedTo, postId), eq(commentsTable.post, false))
     );
-  (findPost as any).comments = (
-    await db
-      .select({ s: count() })
-      .from(commentsTable)
-      .where(eq(commentsTable.relatedTo, findPost.id))
-  )?.[0].s;
-
-  const allvotes = await db
-    .select()
-    .from(voteTable)
-    .where(eq(voteTable.commentId, findPost.id));
-  const total =
-    allvotes.filter((x) => x.type == "up").length -
-    allvotes.filter((x) => x.type == "down").length;
-  (findPost as any).votes = total;
-
-  for (const post of replies) {
-    (post as any).comments = (
-      await db
-        .select({ s: count() })
-        .from(commentsTable)
-        .where(eq(commentsTable.relatedTo, post.id))
-    )?.[0].s;
-
-    const allvotes = await db
-      .select()
-      .from(voteTable)
-      .where(eq(voteTable.commentId, post.id));
-    const total =
-      allvotes.filter((x) => x.type == "up").length -
-      allvotes.filter((x) => x.type == "down").length;
-    (post as any).votes = total;
-  }
+  await setCommentDetails(findPost);
+  for (const post of replies) await setCommentDetails(post);
 
   return res.status(200).json({ post: findPost, replies });
 });

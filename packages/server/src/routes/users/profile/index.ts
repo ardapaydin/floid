@@ -3,6 +3,7 @@ import { db } from "../../../database/db";
 import user from "../../../helpers/db/selects/user";
 import {
   blockedUsersTable,
+  bookmarksTable,
   commentsTable,
   communitiesTable,
   communityMembersTable,
@@ -35,6 +36,13 @@ router.get("/:name/profile", async (req, res) => {
       and(
         eq(voteTable.commentId, commentsTable.id),
         eq(voteTable.userId, req.user?.id || "")
+      )
+    )
+    .leftJoin(
+      bookmarksTable,
+      and(
+        eq(bookmarksTable.userId, req.user?.id || ""),
+        eq(bookmarksTable.postId, commentsTable.id)
       )
     )
     .orderBy(desc(commentsTable.createdAt));

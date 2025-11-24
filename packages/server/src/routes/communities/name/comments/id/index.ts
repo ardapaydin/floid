@@ -5,11 +5,12 @@ import BodyValidationMiddleware from "../../../../../helpers/middlewares/BodyVal
 import z from "zod";
 import { db } from "../../../../../database/db";
 import {
+  bookmarksTable,
   commentsTable,
   communitiesTable,
   voteTable,
 } from "../../../../../database";
-import { and, eq, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { createCommentSchema } from "../../../../../helpers/validations/communities/comment/create";
 import post from "../../../../../helpers/db/selects/post";
 import { setCommentDetails } from "../../../../../helpers/details/comment";
@@ -116,6 +117,13 @@ router.post(
         and(
           eq(voteTable.commentId, commentsTable.id),
           eq(voteTable.userId, req.user?.id || "")
+        )
+      )
+      .leftJoin(
+        bookmarksTable,
+        and(
+          eq(bookmarksTable.userId, req.user?.id || ""),
+          eq(bookmarksTable.postId, commentsTable.id)
         )
       )
       .where(
