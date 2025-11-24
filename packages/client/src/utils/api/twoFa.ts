@@ -1,0 +1,19 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+export function useTwoFactor(enabled: boolean) {
+  return useQuery({
+    queryKey: ["users", "me", "2fa", "setup"],
+    queryFn: async () => {
+      const r = await axios.post("/users/me/2fa/setup");
+      return r.data as {
+        success: boolean;
+        data: {
+          qrUrl: string;
+          secret: string;
+        };
+      };
+    },
+    enabled,
+  });
+}

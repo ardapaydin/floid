@@ -23,6 +23,7 @@ import {
 const router = express.Router();
 import profileRouter from "./profile";
 import blockRouter from "./block";
+import mfaRouter from "./mfa";
 import { requireAuth } from "../../helpers/middlewares/Auth";
 import FileValidationMiddleware from "../../helpers/middlewares/FileValidation";
 import fileUpload, { UploadedFile } from "express-fileupload";
@@ -409,5 +410,6 @@ router.get(
 
 router.use(profileRouter);
 router.use(blockRouter);
+router.use(mfaRouter);
 
 export default router;
