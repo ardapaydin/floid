@@ -16,6 +16,7 @@ import { Attachments } from "./Parts/Attachments";
 import { useUser } from "@/utils/api/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { MemberContextMenu } from "@/components/ContextMenu/Member";
+import { CommunityHoverCard } from "@/components/HoverCards/Community";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user" | "feed"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -68,27 +69,31 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                             </div>
                         </MemberContextMenu>
                     ) || (section == "post" && (
-                        <div className="flex gap-2 cursor-pointer" onClick={() => nav("/c/" + community.data?.name)}>
-                            <CommunityIcon community={community.data!} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
-                            <div className="flex flex-col">
-                                <h1 className="text-white/90">c/{community.data!.name}</h1>
-                                <MemberContextMenu community={community.data!.name} member={user}>
-                                    <span className="cursor-pointer hover:text-white transition-all" onClick={() => nav("/u/" + user?.username)}>{user?.displayName}</span>
-                                </MemberContextMenu>
+                        <CommunityHoverCard community={community.data!}>
+                            <div className="flex gap-2 cursor-pointer" onClick={() => nav("/c/" + community.data?.name)}>
+                                <CommunityIcon community={community.data!} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
+                                <div className="flex flex-col">
+                                    <h1 className="text-white/90">c/{community.data!.name}</h1>
+                                    <MemberContextMenu community={community.data!.name} member={user}>
+                                        <span className="cursor-pointer hover:text-white transition-all" onClick={() => nav("/u/" + user?.username)}>{user?.displayName}</span>
+                                    </MemberContextMenu>
+                                </div>
                             </div>
-                        </div>
+                        </CommunityHoverCard>
                     ))}
                     {"community" in post && (
-                        <div className="flex gap-2 cursor-pointer" onClick={() => nav("/c/" + post.community.name)}>
-                            <CommunityIcon community={post.community} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
-                            <div className="flex flex-col">
-                                <h1 className="text-white/90">c/{post.community.name}</h1>
-                                <span>{user?.displayName}</span>
+                        <CommunityHoverCard community={post.community}>
+                            <div className="flex gap-2 cursor-pointer" onClick={() => nav("/c/" + post.community.name)}>
+                                <CommunityIcon community={post.community} style={{ fontSize: "0.7rem" }} className="w-6 h-6" />
+                                <div className="flex flex-col">
+                                    <h1 className="text-white/90">c/{post.community.name}</h1>
+                                    <span>{user?.displayName}</span>
+                                </div>
+                                {post.community.visibility == "private" && (
+                                    <Lock className="w-4 h-4" />
+                                )}
                             </div>
-                            {post.community.visibility == "private" && (
-                                <Lock className="w-4 h-4" />
-                            )}
-                        </div>
+                        </CommunityHoverCard>
 
                     )}
                     <p className="text-xs">•</p>
