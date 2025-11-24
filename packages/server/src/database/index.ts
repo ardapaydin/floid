@@ -9,3 +9,4 @@ export * from "./schemas/invites";
 export * from "./schemas/loggedOut";
 export * from "./schemas/blockedUsers";
 export * from "./schemas/bans";
+export * from "./schemas/resetPassword";

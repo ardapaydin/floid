@@ -3,10 +3,12 @@ import VerifyEmail from "./templates/verifyEmail";
 import EmailLayout from "./templates/layout";
 import { render } from "@react-email/components";
 import React from "react";
+import ResetPassword from "./templates/resetPassword";
 
 const templates = {
   VerifyEmail,
   EmailLayout,
+  ResetPassword,
 };
 
 export async function sendEmail(

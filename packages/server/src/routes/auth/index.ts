@@ -4,7 +4,6 @@ import { registerSchema } from "../../helpers/validations/auth/register";
 import { db } from "../../database/db";
 import { count, eq } from "drizzle-orm";
 import { usersTable } from "../../database";
-import createId from "../../helpers/id/createId";
 import {
   ComparePassword,
   EncryptPassword,
@@ -14,9 +13,11 @@ import { requireAuth, requireNoAuth } from "../../helpers/middlewares/Auth";
 import { signToken } from "../../helpers/auth/jwt";
 import { createToken } from "../../email/verification/generateToken";
 import EmailRouter from "./email";
+import PasswordRouter from "./password";
 import { loggedOutTokensTable } from "../../database/schemas/loggedOut";
 const router = express.Router();
 router.use(EmailRouter);
+router.use(PasswordRouter);
 router.post(
   "/register",
   requireNoAuth,

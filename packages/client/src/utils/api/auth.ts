@@ -27,3 +27,22 @@ export function requestVerifyToken() {
 export function logout() {
   return axios.post("/auth/logout");
 }
+
+export function requestResetPasswordToken(email: string) {
+  return axios.post("/auth/forgot-password", { email });
+}
+
+export function useResetPasswordToken(token: string | null) {
+  return useQuery({
+    queryKey: ["reset-password", token],
+    queryFn: async () => {
+      const r = await axios.get("/auth/reset-password?token=" + token);
+      return r.data as { success: boolean; message: string };
+    },
+    enabled: Boolean(token),
+  });
+}
+
+export function resetPassword(token: string, password: string) {
+  return axios.post("/auth/reset-password", { token, password });
+}

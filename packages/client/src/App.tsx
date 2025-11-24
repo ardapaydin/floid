@@ -12,6 +12,7 @@ import VerifyEmail from "./pages/Auth/VerifyEmail";
 import { Invite } from "./pages/Main/Invite";
 import AccountSettings from "./pages/Settings/Account";
 import ProfileSettings from "./pages/Settings/Profile";
+import { ResetPassword } from "./pages/Auth/ResetPassword";
 
 function App() {
   const user = useUser()
@@ -25,6 +26,7 @@ function App() {
       <Route path="/u/:name" element={<User />} />
       <Route path="/invite/:id" element={<Invite />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/settings/account" element={<AccountSettings />} />
       <Route path="/settings/profile" element={<ProfileSettings />} />
       <Route path="/login" element={<Login />} />

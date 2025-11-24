@@ -4,6 +4,7 @@ import { useState } from "react";
 import { login } from "../../utils/api/auth";
 import { setToken } from "../../utils/auth/user";
 import { User } from "lucide-react";
+import { ForgotPassword } from "@/components/Dialogs/Auth/ForgotPassword";
 
 export default function Login() {
     const user = useUser();
@@ -83,8 +84,15 @@ export function LoginContent() {
                     Login
                 </button>
 
-                <div className="flex justify-end text-sm text-gray-400 mt-2 gap-1">
-                    Don't have an account? <a href="/register" className="text-orange-500">Sign up</a>
+                <div className="flex justify-between text-sm text-gray-400 mt-2 gap-1">
+                    <p>
+                        Don't have an account? <a href="/register" className="text-orange-500">Sign up</a>
+                    </p>
+                    <ForgotPassword>
+                        <p className="text-orange-500 cursor-pointer hover:underline">
+                            Forgot Password
+                        </p>
+                    </ForgotPassword>
                 </div>
             </div>
 
