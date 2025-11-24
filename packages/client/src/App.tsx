@@ -15,6 +15,7 @@ import ProfileSettings from "./pages/Settings/Profile";
 import { ResetPassword } from "./pages/Auth/ResetPassword";
 import Search from "./pages/Main/Search";
 import { Bookmarks } from "./pages/Main/Bookmarks";
+import { NotFound } from "./pages/Main/NotFound";
 
 function App() {
   const user = useUser()
@@ -35,6 +36,7 @@ function App() {
       <Route path="/settings/profile" element={<ProfileSettings />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

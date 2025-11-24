@@ -1,13 +1,18 @@
 import ObserverPost from "@/components/Community/Post/Post";
 import Layout from "@/components/Layout/layout";
 import Loading from "@/components/Loading/Loading";
-import { useBookmarks } from "@/utils/api/users";
+import { useBookmarks, useUser } from "@/utils/api/users";
 import { BookmarkX, Search } from "lucide-react";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 export function Bookmarks() {
     const [query, setQuery] = useState("");
     const saves = useBookmarks(query);
+    const user = useUser();
+
+    if (!user.data?.user) return <Navigate to={"/login"} />
+
     return (
         <Layout>
             <div className="flex flex-col">
