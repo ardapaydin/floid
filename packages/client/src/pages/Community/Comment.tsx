@@ -16,6 +16,7 @@ import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { NotFound } from "../Main/NotFound";
 
 export default function Comment() {
     const { name, commentId } = useParams()
@@ -32,6 +33,7 @@ export default function Comment() {
         addRecentPost({ ...post.data.post, community: community.data as Community })
     }, [post.data, name, community.data])
     if (!community.data || !post.data) return <Layout><Loading /></Layout>
+    if (!post.isLoading && !post.data?.post) return <NotFound />
 
     return (
         <Layout>

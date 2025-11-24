@@ -6,6 +6,7 @@ import { addRecentCommunity } from "@/store/recentCommunities";
 import { useCommunities, useCommunityByName } from "@/utils/api/community";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { NotFound } from "../Main/NotFound";
 
 export default function Community() {
     const { name } = useParams()
@@ -15,7 +16,7 @@ export default function Community() {
         if (!community?.data?.id) return;
         addRecentCommunity(community.data)
     }, [community.data])
-    if (community.isLoading || communities.isLoading || !community.data) return <Layout><div></div></Layout>
+    if (community.isLoading || communities.isLoading || !community?.data?.id) return <NotFound />
     return (
         <Layout>
             <div className="flex flex-col">

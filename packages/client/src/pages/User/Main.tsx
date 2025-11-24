@@ -9,6 +9,7 @@ import { Image, Pencil } from "lucide-react";
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
 import MainSections from "./Sections/Main";
+import { NotFound } from "../Main/NotFound";
 
 export default function User() {
     const { name } = useParams();
@@ -80,7 +81,7 @@ export default function User() {
             }))
         }
     }
-
+    if (!profile.isLoading && !profile?.data?.id) return <NotFound />
     return (
         <Layout>
             {profile.isLoading && <Loading /> ||
