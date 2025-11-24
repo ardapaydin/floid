@@ -15,6 +15,7 @@ import CommentsRouter from "./comments";
 import PostsRouter from "./posts";
 import MembersRouter from "./members";
 import RulesRouter from "./rules";
+import FlairsRouter from "./flairs";
 import InvitesRouter from "./invites";
 import AttachmentsRouter from "./attachments";
 import RolesRouter from "./roles";
@@ -216,5 +217,6 @@ router.use(RulesRouter);
 router.use(AttachmentsRouter);
 router.use(RolesRouter);
 router.use(InvitesRouter);
+router.use(FlairsRouter);
 
 export default router;

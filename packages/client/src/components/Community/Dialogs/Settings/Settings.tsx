@@ -6,6 +6,7 @@ import PrivacyPage from "./Pages/Privacy";
 import RulesPage from "./Pages/Rules";
 import { ModeratorsPage } from "./Pages/Moderators";
 import BansPage from "./Pages/Bans";
+import { FlairsPage } from "./Pages/Flairs";
 export default function CommunitySettings({ children }: { children: React.ReactNode }) {
 
     const [page, setPage] = useState("general")
@@ -23,6 +24,7 @@ export default function CommunitySettings({ children }: { children: React.ReactN
                             {page == "rules" && <RulesPage />}
                             {page == "moderators" && <ModeratorsPage />}
                             {page == "bans" && <BansPage />}
+                            {page == "flairs" && <FlairsPage />}
                         </div>
                     </div>
                 </div>

@@ -7,8 +7,8 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import createId from "../../helpers/id/createId";
-import { sql } from "drizzle-orm";
 import { usersTable } from "./users";
+import { flairTable } from "./flairs";
 
 export const communitiesTable = mysqlTable("communities", {
   id: varchar("id", { length: 36 })
@@ -45,5 +45,8 @@ export const communityMembersTable = mysqlTable("community_members", {
   userId: varchar("user_id", { length: 36 })
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
+  flair: varchar("flair_id", { length: 32 }).references(() => flairTable.id, {
+    onDelete: "set null",
+  }),
   joinedAt: timestamp("joined_at").defaultNow(),
 });

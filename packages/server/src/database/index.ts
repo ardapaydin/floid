@@ -11,3 +11,4 @@ export * from "./schemas/blockedUsers";
 export * from "./schemas/bans";
 export * from "./schemas/resetPassword";
 export * from "./schemas/bookmarks";
+export * from "./schemas/flairs";
