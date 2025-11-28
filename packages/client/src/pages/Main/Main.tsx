@@ -30,7 +30,7 @@ export default function Main() {
                                 <div className="flex gap-2 items-center p-2 hover:bg-[#333]/50 cursor-pointer rounded-lg transition-all" onClick={() => nav("/c/" + community.name)}>
                                     <CommunityIcon community={community} className="w-8 h-8" />
                                     <div className="flex flex-col">
-                                        <h1 className="text-sm text-white/60">c/{community.name}</h1>
+                                        <h1 className="text-sm text-white/60 truncate flex w-50">c/{community.name}</h1>
                                         <p className="text-xs text-muted-foreground">{community.members} Members</p>
                                     </div>
                                 </div>
@@ -68,7 +68,7 @@ export function Post({ post }: { post: (Post & { community: Community }) }) {
                 <div className="flex gap-2 items-center">
                     <CommunityIcon community={post.community} className="w-8 h-8" />
                     <div className="flex gap-1 text-white/40 items-center">
-                        <h1 className="text-sm font-medium">c/{post.community.name}</h1>
+                        <h1 className="text-sm font-medium truncate max-w-50">c/{post.community.name}</h1>
                         <p className="text-xs">•</p>
                         <span className="text-xs">
                             {dateToStr(post.createdAt)}
@@ -76,7 +76,7 @@ export function Post({ post }: { post: (Post & { community: Community }) }) {
                     </div>
                 </div>
 
-                <p className="text-xs text-white/50 font-medium group-hover:underline">{post.title}</p>
+                <p className="text-xs text-white/50 font-medium group-hover:underline whitespace-pre-wrap wrap-break-word w-64">{post.title}</p>
 
                 <div className="flex gap-2 text-xs text-white/40">
                     <span>{post.comments} Comments</span>

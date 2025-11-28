@@ -36,7 +36,7 @@ export function Sidebar() {
                                 className="hover:bg-[#333]/20 transition cursor-pointer flex py-3 lg:px-4 rounded-lg gap-2 justify-between text-sm items-center">
                                 <div className="flex items-center gap-2">
                                     <CommunityIcon community={community} className="w-6 h-6" style={{ fontSize: "9px" }} />
-                                    c/{community.name}
+                                    <h1 className="max-w-36 truncate">c/{community.name}</h1>
                                 </div>
                                 {community.visibility == "private" && <Lock className="text-muted-foreground/50" />}
                             </div>
@@ -58,7 +58,7 @@ export function Sidebar() {
                                 className="hover:bg-[#333]/20 transition cursor-pointer flex py-3 lg:px-4 rounded-lg gap-2 justify-between text-sm items-center">
                                 <div className="flex items-center gap-2">
                                     <CommunityIcon community={community} className="w-6 h-6" style={{ fontSize: "9px" }} />
-                                    c/{community.name}
+                                    <h1 className="max-w-36 truncate">c/{community.name}</h1>
                                 </div>
                                 {community.visibility == "private" && <Lock className="text-muted-foreground/50" />}
                             </div>
@@ -85,7 +85,7 @@ export function Sidebar() {
                         className="hover:bg-[#333]/20 transition cursor-pointer flex py-3 lg:px-4 rounded-lg gap-2 justify-between text-sm items-center">
                         <div className="flex items-center gap-2">
                             <CommunityIcon community={community} className="w-6 h-6" style={{ fontSize: "9px" }} />
-                            c/{community.name}
+                            <h1 className="max-w-36 truncate">c/{community.name}</h1>
                         </div>
                         {community.visibility == "private" && <Lock className="text-muted-foreground/50" />}
                     </div>

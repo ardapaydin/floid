@@ -137,7 +137,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                 </div>
             </div>
 
-            {comment.title && <h1 className="text-xl font-semibold">{post.title}</h1>}
+            {comment.title && <h1 className="text-xl font-semibold wrap-break-word">{post.title}</h1>}
             {comment.content && <p className="text-white/80 wrap-break-word whitespace-pre-wrap">{post.content}</p>}
             {Boolean(comment.attachments.length) && <Attachments post={comment} />}
             {
