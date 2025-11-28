@@ -7,6 +7,7 @@ import ExploreRouter from "./explore";
 import CommunitiesRouter from "./communities";
 import InvitesRouter from "./invites";
 import MFARouter from "./mfa";
+import AwardsRouter from "./awards";
 import { verifyToken } from "../helpers/auth/jwt";
 import { db } from "../database/db";
 import { and, count, eq, isNull } from "drizzle-orm";
@@ -46,5 +47,6 @@ router.use("/feed", FeedRouter);
 router.use("/explore", ExploreRouter);
 router.use("/invites", InvitesRouter);
 router.use("/mfa", MFARouter);
+router.use("/awards", AwardsRouter);
 
 export default router;

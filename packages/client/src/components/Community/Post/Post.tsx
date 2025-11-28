@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { userStore } from "@/store/userStore";
 import type { Post as PostType } from "@/types/post";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle, Trash } from "lucide-react";
+import { Award, Badge, ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle, Trash } from "lucide-react";
 import dateToStr from "@/utils/date/dateToStr";
 import { joinCommunity, leaveCommunity, useCommunities, useCommunityByName } from "@/utils/api/community";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ import { useUser } from "@/utils/api/users";
 import { useQueryClient } from "@tanstack/react-query";
 import { MemberContextMenu } from "@/components/ContextMenu/Member";
 import { CommunityHoverCard } from "@/components/HoverCards/Community";
+import { AwardDialog } from "@/components/Dialogs/Post/Award";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user" | "feed"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -173,6 +174,16 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                     </div>
                     <p className="text-xs font-semibold">Share</p>
                 </div>
+
+                <AwardDialog post={comment}>
+                    <div
+                        onClick={(e) => { e.stopPropagation() }}
+                        className="flex bg-[#333]/90 hover:bg-[#444] cursor-pointer transition px-3 gap-1 max-w-min py-1 items-center rounded-full">
+                        <div className="hover:transition rounded-full">
+                            <Award className="w-4" />
+                        </div>
+                    </div>
+                </AwardDialog>
 
             </div>
         </div >
