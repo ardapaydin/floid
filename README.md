@@ -1,8 +1,9 @@
 # Floid
-
+<img width="1920" height="1440" alt="759shots_so" src="https://github.com/user-attachments/assets/3957eda5-c593-4090-9510-814a6e7cf781" />
 Floid is a simple proprietary social news and forum social media platform.
 
 ## Self Host
+
 
 1. **Clone Repo**
 
