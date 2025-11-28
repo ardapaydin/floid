@@ -16,7 +16,7 @@ export function UserAwards({ children }: { children: React.ReactNode }) {
             <DialogContent>
                 {awards.isLoading && <Loading /> || (
                     <div className="flex flex-col gap-2 py-4 max-h-96">
-                        {awards.data!.filter(x => x.quantity).map((award) => (
+                        {awards.data?.filter(x => x.quantity).map((award) => (
                             <div className="justify-between flex items-center">
                                 <div className="flex gap-1 items-center">
                                     <h1>{award.emoji}</h1>
