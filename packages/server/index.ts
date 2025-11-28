@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express from "express";
 const app = express();
-
+import cors from "cors";
+app.use(cors({ origin: "*" }));
 console.log("[SERVER] Starting");
 if (!process.env.PORT) throw new Error("PORT is not defined in .env");
 
