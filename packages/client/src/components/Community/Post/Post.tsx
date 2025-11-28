@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { MemberContextMenu } from "@/components/ContextMenu/Member";
 import { CommunityHoverCard } from "@/components/HoverCards/Community";
 import { AwardDialog } from "@/components/Dialogs/Post/Award";
+import Loading from "@/components/Loading/Loading";
 
 function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (PostType & { community: Community })), section?: ("posts" | "post" | "user" | "feed"), relatedTitle?: string }) {
     const { name } = useParams<{ name: string }>();
@@ -32,7 +33,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
         return <Post post={post} section={section} relatedTitle={relatedTitle} />
     }
     const user = userStore.getUser(name!, comment.createdBy);
-    if (section !== "user" && !community.data) return <div>something wrong</div>
+    if (section !== "user" && !community.data) return <Loading />
 
     const votepost = async (vote: ("up" | "down" | null)) => {
         commentStore.voteComment(post.id, vote)
