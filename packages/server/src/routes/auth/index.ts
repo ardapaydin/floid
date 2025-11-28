@@ -2,8 +2,8 @@ import express from "express";
 import BodyValidationMiddleware from "../../helpers/middlewares/BodyValidation";
 import { registerSchema } from "../../helpers/validations/auth/register";
 import { db } from "../../database/db";
-import { count, eq } from "drizzle-orm";
-import { usersTable } from "../../database";
+import { and, count, eq } from "drizzle-orm";
+import { twoFactorAuthenticatonTable, usersTable } from "../../database";
 import {
   ComparePassword,
   EncryptPassword,
@@ -15,6 +15,7 @@ import { createToken } from "../../email/verification/generateToken";
 import EmailRouter from "./email";
 import PasswordRouter from "./password";
 import { loggedOutTokensTable } from "../../database/schemas/loggedOut";
+import { RequireMFA } from "../../helpers/middlewares/RequireMFA";
 const router = express.Router();
 router.use(EmailRouter);
 router.use(PasswordRouter);
@@ -95,6 +96,21 @@ router.post(
           email: ["The email address or password is incorrect."],
         },
       });
+    if (find.emailVerified) {
+      const [twofa] = await db
+        .select()
+        .from(twoFactorAuthenticatonTable)
+        .where(
+          and(
+            eq(twoFactorAuthenticatonTable.userId, find.id),
+            eq(twoFactorAuthenticatonTable.verified, true)
+          )
+        );
+      if (twofa) {
+        const mfaValidate = await RequireMFA(req, ["backup", "totp"], find.id);
+        if (!mfaValidate?.success) return res.status(400).json(mfaValidate);
+      }
+    }
 
     return res.status(200).json({
       success: true,

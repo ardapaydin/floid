@@ -5,6 +5,7 @@ import { login } from "../../utils/api/auth";
 import { setToken } from "../../utils/auth/user";
 import { User } from "lucide-react";
 import { ForgotPassword } from "@/components/Dialogs/Auth/ForgotPassword";
+import { useTwoFactorDialogStore } from "@/store/twoFactorDialogStore";
 
 export default function Login() {
     const user = useUser();
@@ -24,7 +25,7 @@ export default function Login() {
 }
 
 export function LoginContent() {
-
+    const { setIsOpen, setData } = useTwoFactorDialogStore();
     const [form, setForm] = useState({
         email: "",
         password: ""
@@ -32,11 +33,19 @@ export function LoginContent() {
     const [errors, setErrors] = useState<Record<string, string[]>>({})
 
     const post = async () => {
+        setErrors({})
         const req = await login(form.email, form.password);
         if (req.status == 200) {
             await setToken(req.data.data.token)
-            window.location.href = "/"
-        } else setErrors(req.data.errors)
+            window.location.replace("/")
+        } else if (req.data?.message == "2fa") {
+            setData({
+                function: post,
+                mfa: req.data?.mfa
+            })
+            setIsOpen(true)
+        } else
+            setErrors(req.data.errors)
     }
 
     const validate = () => {

@@ -55,6 +55,13 @@ export async function RequireMFA(
 
     if (!options.includes(verifyt.type))
       return { success: false, message: "This option is not supported" };
+    if (find)
+      await db
+        .update(twoFactorAuthenticatonTable)
+        .set({
+          lastUsedAt: new Date(),
+        })
+        .where(eq(twoFactorAuthenticatonTable.id, find.id));
 
     return { success: true };
   }
