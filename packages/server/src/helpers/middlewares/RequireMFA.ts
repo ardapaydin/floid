@@ -32,6 +32,7 @@ export async function RequireMFA(
         message: "2fa",
         mfa: {
           ticket,
+          options,
         },
       };
 
@@ -45,7 +46,7 @@ export async function RequireMFA(
       return {
         success: false,
         message: "2fa",
-        mfa: { ticket },
+        mfa: { ticket, options },
       };
     }
 

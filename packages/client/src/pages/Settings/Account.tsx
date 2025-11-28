@@ -8,9 +8,32 @@ import { DeleteAccount } from "@/components/Dialogs/Settings/DeleteAccount";
 import BlockedUsers from "@/components/Dialogs/Settings/BlockedUsers";
 import { TwoFactorAuthentication } from "@/components/Dialogs/Settings/TwoFactorAuthentication";
 import { cn } from "@/lib/utils";
+import { disableTwoFactor } from "@/utils/api/twoFa";
+import { useTwoFactorDialogStore } from "@/store/twoFactorDialogStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AccountSettings() {
     const user = useUser();
+    const { setIsOpen, setData } = useTwoFactorDialogStore();
+
+    const qc = useQueryClient();
+
+    const disableTwoFa = async () => {
+        const r = await disableTwoFactor();
+        if (r?.data?.message == "2fa") {
+            setData({
+                function: disableTwoFa,
+                mfa: r.data?.mfa
+            });
+            setIsOpen(true);
+        } else if (r.data?.success) {
+            qc.setQueryData(["users", "me"], (old: { twoFactor: boolean }) => ({
+                ...old,
+                twoFactor: false
+            }))
+        }
+    }
+
     return (
         <Layout>
             <SettingsLayout>
@@ -66,7 +89,9 @@ export default function AccountSettings() {
                             </div>
                         </div>
                     </TwoFactorAuthentication>
-                    <div className={cn("w-full group text-sm cursor-pointer py-2 text-white/90 justify-between flex", !user.data?.twoFactor && "hidden")}>
+                    <div
+                        onClick={() => disableTwoFa()}
+                        className={cn("w-full group text-sm cursor-pointer py-2 text-white/90 justify-between flex", !user.data?.twoFactor && "hidden")}>
                         <span>Two Factor Authentication</span>
                         <div className="flex gap-2 text-xs items-center">
                             <div className={cn("w-2 h-2 bg-red-400 rounded-full", user?.data?.twoFactor && "bg-green-400")} />

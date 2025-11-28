@@ -12,6 +12,7 @@ import { toDataURL } from "qrcode";
 import BodyValidationMiddleware from "../../../helpers/middlewares/BodyValidation";
 import z from "zod";
 import { createBackupCodes } from "../../../helpers/utils/createBackupCodes";
+import { RequireMFA } from "../../../helpers/middlewares/RequireMFA";
 const router = express.Router();
 
 router.post("/me/2fa/setup", requireAuth, async (req, res) => {
@@ -127,5 +128,36 @@ router.post(
     return res.status(200).json({ success: true, codes: backupcodes });
   }
 );
+
+router.delete("/me/2fa", requireAuth, async (req, res) => {
+  const [enabled] = await db
+    .select()
+    .from(twoFactorAuthenticatonTable)
+    .where(
+      and(
+        eq(twoFactorAuthenticatonTable.userId, req.user!.id),
+        eq(twoFactorAuthenticatonTable.verified, true)
+      )
+    );
+
+  if (!enabled)
+    return res
+      .status(400)
+      .json({ success: false, message: "2fa already disabled." });
+
+  const validate = await RequireMFA(req, ["totp", "backup"]);
+
+  if (!validate?.success) return res.status(400).json(validate);
+
+  await db
+    .delete(backupCodesTable)
+    .where(eq(backupCodesTable.twoFaId, enabled.id));
+
+  await db
+    .delete(twoFactorAuthenticatonTable)
+    .where(eq(twoFactorAuthenticatonTable.id, enabled.id));
+
+  return res.status(200).json({ success: true });
+});
 
 export default router;

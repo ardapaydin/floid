@@ -44,8 +44,7 @@ router.post("/finish", async (req, res) => {
         message: "bad request",
         errors: { code: ["Invalid code."] },
       });
-  }
-  if (type == "backup") {
+  } else if (type == "backup") {
     const [findBackupCode] = await db
       .select()
       .from(backupCodesTable)

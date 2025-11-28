@@ -21,3 +21,11 @@ export function useTwoFactor(enabled: boolean) {
 export function verifyTwoFactor(code: string) {
   return axios.post("/users/me/2fa/verify", { code });
 }
+
+export function disableTwoFactor() {
+  return axios.delete("/users/me/2fa");
+}
+
+export function finishMFA(type: string, code: string, ticket: string) {
+  return axios.post("/mfa/finish", { type, code, ticket });
+}
