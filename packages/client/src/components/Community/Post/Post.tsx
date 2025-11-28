@@ -29,10 +29,10 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
     const qc = useQueryClient();
     if (!comment) {
         commentStore.setComment(post);
-        return;
+        return <div>comment loading</div>;
     }
     const user = userStore.getUser(name!, comment.createdBy);
-    if (section !== "user" && !community.data) return
+    if (section !== "user" && !community.data) return <div>something wrong</div>
 
     const votepost = async (vote: ("up" | "down" | null)) => {
         commentStore.voteComment(post.id, vote)
@@ -51,7 +51,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
         if (r.status == 200) qc.setQueryData(["communities"], (old: Community[]) => (old.filter(x => x.id != post.communityId)))
     }
 
-    if ("community" in post && post.community.visibility == "private" && !communities.data?.find((x) => x.id == post.communityId)) return;
+    if ("community" in post && post.community.visibility == "private" && !communities.data?.find((x) => x.id == post.communityId)) return <div>you dont have permission to view this post</div>;
 
     return (
         <div
