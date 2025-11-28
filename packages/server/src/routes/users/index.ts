@@ -42,6 +42,7 @@ import post from "../../helpers/db/selects/post";
 import QueryValidationMiddleware from "../../helpers/middlewares/QueryValidation";
 import z from "zod";
 import { setCommentDetails } from "../../helpers/details/comment";
+import { RequireMFA } from "../../helpers/middlewares/RequireMFA";
 router.use(fileUpload({ safeFileNames: true }));
 
 router.get("/me", async (req, res) => {
@@ -77,13 +78,11 @@ router.get("/me", async (req, res) => {
       )
     );
 
-  return res
-    .status(200)
-    .json({
-      user,
-      blocked: blocked.map((block) => block.blockedUser),
-      twoFactor: Boolean(twoFactor),
-    });
+  return res.status(200).json({
+    user,
+    blocked: blocked.map((block) => block.blockedUser),
+    twoFactor: Boolean(twoFactor),
+  });
 });
 
 router.post(
@@ -257,6 +256,9 @@ router.delete(
           password: ["Password is incorrect."],
         },
       });
+
+    const mfa = await RequireMFA(req);
+    if (!mfa?.success) return res.status(400).json(mfa);
 
     await db
       .update(usersTable)

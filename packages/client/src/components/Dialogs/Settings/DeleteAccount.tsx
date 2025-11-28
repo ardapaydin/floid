@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useTwoFactorDialogStore } from "@/store/twoFactorDialogStore";
 import { deleteUser } from "@/utils/api/users";
 import { removeToken } from "@/utils/auth/user";
 import { useState } from "react";
@@ -8,6 +9,7 @@ export function DeleteAccount({ children }: { children: React.ReactNode }) {
         password: "",
         confirmPassword: ""
     });
+    const { setData, setIsOpen } = useTwoFactorDialogStore();
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const validate = () => {
         if (!form.password?.trim() || !form.confirmPassword?.trim() || form.confirmPassword != form.password) return false;
@@ -18,7 +20,13 @@ export function DeleteAccount({ children }: { children: React.ReactNode }) {
         const del = await deleteUser(form.password);
         if (del.status == 200) {
             removeToken();
-            window.location.href = "/"
+            window.location.replace("/")
+        } else if (del?.data?.message == "2fa") {
+            setData({
+                function: post,
+                mfa: del.data.mfa
+            })
+            setIsOpen(true)
         } else setErrors(del.data?.errors)
     }
 
