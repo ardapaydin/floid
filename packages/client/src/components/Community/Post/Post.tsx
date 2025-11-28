@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { userStore } from "@/store/userStore";
 import type { Post as PostType } from "@/types/post";
 import { useNavigate, useParams } from "react-router-dom";
-import { Award, Badge, ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle, Trash } from "lucide-react";
+import { Award, ChevronDown, ChevronUp, EllipsisIcon, Forward, Lock, MessageCircle, Trash } from "lucide-react";
 import dateToStr from "@/utils/date/dateToStr";
 import { joinCommunity, leaveCommunity, useCommunities, useCommunityByName } from "@/utils/api/community";
 import { cn } from "@/lib/utils";
@@ -175,15 +175,17 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
                     <p className="text-xs font-semibold">Share</p>
                 </div>
 
-                <AwardDialog post={comment}>
-                    <div
-                        onClick={(e) => { e.stopPropagation() }}
-                        className="flex bg-[#333]/90 hover:bg-[#444] cursor-pointer transition px-3 gap-1 max-w-min py-1 items-center rounded-full">
-                        <div className="hover:transition rounded-full">
-                            <Award className="w-4" />
+                {comment.createdBy != loggedUser?.data?.user?.id &&
+                    <AwardDialog post={comment}>
+                        <div
+                            onClick={(e) => { e.stopPropagation() }}
+                            className="flex bg-[#333]/90 hover:bg-[#444] cursor-pointer transition px-3 gap-1 max-w-min py-1 items-center rounded-full">
+                            <div className="hover:transition rounded-full">
+                                <Award className="w-4" />
+                            </div>
                         </div>
-                    </div>
-                </AwardDialog>
+                    </AwardDialog>
+                }
 
             </div>
         </div >

@@ -6,13 +6,14 @@ import {
   voteTable,
 } from "../../../../../database";
 import { db } from "../../../../../database/db";
-import { and, count, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import post from "../../../../../helpers/db/selects/post";
+import awardRouter from "./award";
 import CanAccessCommunity from "../../../../../helpers/middlewares/CanAccessCommunity";
 import { requireAuth } from "../../../../../helpers/middlewares/Auth";
 import { setCommentDetails } from "../../../../../helpers/details/comment";
 const router = express.Router();
-
+router.use(awardRouter);
 router.get("/:name/posts/:postId", CanAccessCommunity, async (req, res) => {
   const { name, postId } = req.params;
   const [findCommunity] = await db

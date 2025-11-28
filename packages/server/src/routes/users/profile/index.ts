@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../../../database/db";
 import user from "../../../helpers/db/selects/user";
 import {
+  awardTable,
   blockedUsersTable,
   bookmarksTable,
   commentsTable,
@@ -15,6 +16,7 @@ import { and, count, desc, eq } from "drizzle-orm";
 import { setCommentDetails } from "../../../helpers/details/comment";
 import post from "../../../helpers/db/selects/post";
 import { requireAuth } from "../../../helpers/middlewares/Auth";
+import awards from "../../../data/awards";
 const router = express.Router();
 
 router.get("/:name/profile", async (req, res) => {
@@ -100,14 +102,42 @@ router.get("/:name/profile", async (req, res) => {
       )
     );
 
+  const [awarded] = await db
+    .select({ count: count() })
+    .from(awardTable)
+    .where(eq(awardTable.awardedTo, u.id));
+
   return res.status(200).json({
     ...u,
     rep,
     posts: commentsList.filter((x) => !x.replyTo),
     comments: commentsList.filter((x) => x.replyTo),
+    awards: awarded.count,
     followers,
     following: !!following,
   });
+});
+
+router.get("/:name/awards", async (req, res) => {
+  const { name } = req.params;
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.username, name));
+  if (!user)
+    return res.status(400).json({ success: false, message: "user not found." });
+
+  const awarded = await db
+    .select()
+    .from(awardTable)
+    .where(eq(awardTable.awardedTo, user.id));
+
+  const list = awards.map((award) => ({
+    ...award,
+    quantity: awarded.filter((x) => x.gived == String(award.id)).length,
+  }));
+
+  return res.status(200).json(list);
 });
 
 router.post("/:name/follow", requireAuth, async (req, res) => {

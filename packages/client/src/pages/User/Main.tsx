@@ -5,11 +5,12 @@ import type { User } from "@/types/user";
 import { blockUser, followUser, unblockUser, unfollowUser, updateUserBanner, updateUserProfilePicture, useUser, useUserProfile } from "@/utils/api/users";
 import dateToStr from "@/utils/date/dateToStr";
 import { useQueryClient } from "@tanstack/react-query";
-import { Image, Pencil } from "lucide-react";
+import { ChevronRight, Image, Pencil } from "lucide-react";
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
 import MainSections from "./Sections/Main";
 import { NotFound } from "../Main/NotFound";
+import { UserAwards } from "@/components/Dialogs/Users/Awards";
 
 export default function User() {
     const { name } = useParams();
@@ -159,6 +160,18 @@ export default function User() {
                                         <span className="text-sm font-bold">{profile.data?.followers}</span>
                                         <h1 className="text-white/50">Followers</h1>
                                     </div>
+
+
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold">{profile.data?.awards}</span>
+                                        <UserAwards>
+                                            <div className="flex items-center cursor-pointer text-white/50 gap-1">
+                                                <h1>Awards</h1>
+                                                <ChevronRight className="w-4" />
+                                            </div>
+                                        </UserAwards>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

@@ -70,3 +70,9 @@ export function savePost(name: string, postId: string) {
 export function unsavePost(name: string, postId: string) {
   return axios.delete("/community/" + name + "/posts/" + postId + "/save");
 }
+
+export function awardPost(name: string, postId: string, awardId: number) {
+  return axios.post("/community/" + name + "/posts/" + postId + "/awards", {
+    awardId,
+  });
+}

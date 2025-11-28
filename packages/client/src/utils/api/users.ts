@@ -3,6 +3,7 @@ import axios from "axios";
 import type { User } from "../../types/user";
 import type { Post } from "@/types/post";
 import type { Community } from "@/types/community";
+import type { Award } from "@/types/award";
 
 export function useUser() {
   return useQuery({
@@ -29,6 +30,7 @@ export function useUserProfile(name: string) {
         comments: (Post & { community: Community; relatedTitle: string })[];
         followers: number;
         following: boolean;
+        awards: number;
       };
     },
   });
@@ -97,5 +99,16 @@ export function useBookmarks(query: string) {
       lastPage.pagination?.hasNextPage
         ? lastPage.pagination?.currentPage * 10
         : undefined,
+  });
+}
+
+export function useAwards(user: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["users", user, "awards"],
+    queryFn: async () => {
+      const r = await axios.get("/users/" + user + "/awards");
+      return r.data as (Award & { quantity: number })[];
+    },
+    enabled,
   });
 }
