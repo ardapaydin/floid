@@ -29,7 +29,7 @@ function Post({ post, section = "posts", relatedTitle }: { post: (PostType | (Po
     const qc = useQueryClient();
     if (!comment) {
         commentStore.setComment(post);
-        return <div>comment loading</div>;
+        return <Post post={post} section={section} relatedTitle={relatedTitle} />
     }
     const user = userStore.getUser(name!, comment.createdBy);
     if (section !== "user" && !community.data) return <div>something wrong</div>
