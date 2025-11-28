@@ -210,6 +210,13 @@ router.get(
           isNull(blockedUsersTable.blockedUser)
         )
       )
+      .leftJoin(
+        bookmarksTable,
+        and(
+          eq(bookmarksTable.userId, req.user?.id || ""),
+          eq(bookmarksTable.postId, commentsTable.id)
+        )
+      )
       .groupBy(commentsTable.id)
       .orderBy(desc(commentsTable.createdAt))
       .limit(10)
